@@ -1,10 +1,11 @@
 ;;; Copyright rif 2004
 
-(declaim (optimize (speed 1) (debug 3) (safety 3)))
+(declaim (optimize (speed 3) (debug 0) (safety 1)))
 ;; (declaim (optimize (speed 1) (safety 3) (debug 3)))
 
 (defpackage "RCLG"
-  (:use :common-lisp :uffi :rclg-load :common-idioms)
+  (:use :common-lisp :uffi :rclg-load )
+	;; :common-idioms)
   (:export :start-r :rclg :r :sexp :*backconvert* :*r-started*
 	   :r-convert :r-do-not-convert :convert-to-r
 	   :sexp-not-needed :update-r :def-r-call :*r-NA* :r-na))
@@ -15,10 +16,24 @@
   (unless *rclg-loaded*
     (error "rclg-load has not loaded the R libraries.")))
 
-(defvar *r-default-argv* '("rclg" "-q" "--vanilla"))
+(eval-when (:compile-toplevel :load-toplevel)
+  (defvar *r-default-argv* '("rclg" "-q" "--vanilla"))
+  (defvar *r-NA-internal* -2147483648) ;;  PLATFORM SPECIFIC HACK!!!
+  (defvar *r-na* 'r-na)
+  
+  (defvar +int-seq+ 1)
+  (defvar +float-seq+ 2)
+  (defvar +complex-seq+ 3)
+  (defvar +string-seq+ 4)
+  (defvar +any-seq+ 0))
 
-(defconstant *r-NA-internal* -2147483648) ;;  PLATFORM SPECIFIC HACK!!!
-(defconstant *r-na* 'r-na)
+(defvar +seq-fsm+ #2A((0 0 0 0 0)
+		      (0 1 2 3 0)
+		      (0 2 2 3 0)
+		      (0 3 3 3 0)
+		      (0 0 0 0 4)))
+
+
 
 (defparameter *r-started* nil)
 
@@ -81,15 +96,19 @@
 ;; (defmacro uffi::get-slot-value (obj type slot)
 ;;   (let ((obj-sym (gensym)))
 ;;     `(let ((,obj-sym ,obj))
-;;       (declare (type (alien:alien ,(cadr type)) ,obj-sym))
-;;       (alien:slot ,obj-sym ,slot))))
+;;       (declare (type (sb-alien:alien ,(cadr type)) ,obj-sym))
+;;       (sb-alien:slot ,obj-sym ,slot))))
 
-(defmacro uffi::get-slot-value (obj type slot)
-  `(alien:slot (the (alien:alien (* ,(cadr type))) ,obj)
-    ,slot))
+;; (defmacro uffi::get-slot-value (obj type slot)
+;;   `(sb-alien:slot (the (sb-alien:alien (* ,(cadr type))) ,obj)
+;;     ,slot))
+
+;; (defmacro uffi::get-slot-value (obj type slot)
+;;   `(sb-alien:slot (the (sb-alien:alien ,(cadr type)) ,obj)
+;;     ,slot))
 
 (defmacro uffi::get-direct-value (obj type slot)
-  `(alien:slot (the (alien:alien ,(cadr type)) ,obj) ,slot))
+  `(sb-alien:slot (the (sb-alien:alien ,(cadr type)) ,obj) ,slot))
 
 (defun sexptype (robj)
   "Gets the sexptype of an robj.  WARNING: ASSUMES THAT THE TYPE
@@ -119,6 +138,17 @@ IT CAN BE EXTRACTED VIA A 'mod 32' OPERATION!  MAY NOT BE PORTABLE."
 
 (defun r-car (sexp)
   (get-slot-value (r-get-listsxp sexp) 'listsxp-struct 'carval))
+
+
+(defun r-test (sexp)
+  (format t "--1--~%")
+  (pprint (type-of sexp))
+  (format t "~%--2--~%")
+  (pprint (type-of (r-get-listsxp sexp)))
+  (format t "~%--3--~%")
+  (pprint (get-slot-value (r-get-listsxp sexp) 'listsxp-struct 'carval))
+  (format t "~%--4--~%")
+  )
 
 (defun r-setcar (sexp value)
   (setf (get-slot-value (r-get-listsxp sexp) 'listsxp-struct 'carval)
@@ -266,6 +296,29 @@ IT CAN BE EXTRACTED VIA A 'mod 32' OPERATION!  MAY NOT BE PORTABLE."
   (= (pointer-address robj)
      (pointer-address *r-nil-value*)))
 
+(defun get-from-name-test (name)
+  (declare (type simple-string name))
+  (CONVERT-TO-FOREIGN-STRING NAME))
+
+
+;;	 (installed (%rf-install ident-foreign)))
+
+
+;; 	 (G1360
+;; 	  (PROGN
+;; 	    (let (
+;; 	      (values)))))))
+
+;; 	    (LET ((FOREIGN-VALUE
+;; 		   (%RF-FIND-VAR (%RF-INSTALL IDENT-FOREIGN) *R-GLOBAL-ENV*)))
+;; 	      (values)))))))
+
+;; (IF (R-BOUND FOREIGN-VALUE) FOREIGN-VALUE NIL)))))
+;; (values)))
+;; (DECLARE (DYNAMIC-EXTENT IDENT-FOREIGN))
+;; (FREE-FOREIGN-OBJECT IDENT-FOREIGN)
+;; G1360))
+  
 (defun get-from-name (name)
   "If R has a mapping for name (name is a string), returns the SEXP that points to it,
 otherwise returns NIL."
@@ -305,8 +358,8 @@ otherwise returns NIL."
   :returning (* :double))
   
 ;; (DEFUN %REAL (E)
-;;   (ALIEN:WITH-ALIEN ((%REAL (FUNCTION (* C-CALL:DOUBLE) SEXP) :EXTERN "REAL"))
-;;                     (VALUES (ALIEN:ALIEN-FUNCALL %REAL E))))
+;;   (SB-ALIEN:WITH-ALIEN ((%REAL (FUNCTION (* C-CALL:DOUBLE) SEXP) :EXTERN "REAL"))
+;;                     (VALUES (SB-ALIEN:ALIEN-FUNCALL %REAL E))))
 
 
 ;;; The complex type
@@ -390,17 +443,6 @@ complex robj."
 
 ;;; Sequence and (eventually) Dictionary Conversions
 
-(defconstant +int-seq+ 1)
-(defconstant +float-seq+ 2)
-(defconstant +complex-seq+ 3)
-(defconstant +string-seq+ 4)
-(defconstant +any-seq+ 0)
-
-(defconstant +seq-fsm+ #2A((0 0 0 0 0)
-			   (0 1 2 3 0)
-			   (0 2 2 3 0)
-			   (0 3 3 3 0)
-			   (0 0 0 0 4)))
 
 (defun type-to-int (obj)
   (cond ((eql obj *r-na*) +int-seq+)
@@ -418,14 +460,16 @@ complex robj."
 	  (i 0))
       (typecase seq 
 	((simple-array double-float)
-	 (%double-float-vec-to-R (system:vector-sap seq) len robj))
+	 (%double-float-vec-to-R (sb-sys:vector-sap seq) len robj))
+
 ;; 	 (map nil
 ;; 	      (lambda (e)
 ;; 		(%set-vector-elt robj i (double-float-to-robj e))
 ;; 		(incf i))
 ;; 	      seq))
+
 	((simple-array fixnum)
-	 (%integer-vec-to-R (system:vector-sap seq) len robj 4))
+	 (%integer-vec-to-R (sb-sys:vector-sap seq) len robj 4))
 	(t 
 	 (map nil
 	      (lambda (e)
@@ -496,8 +540,8 @@ real and imaginary points to double-float."
     (let ((complex (deref-pointer (%COMPLEX robj) 'r-complex)))
 ;;       (setf (get-slot-value complex 'r-complex 'r) (coerce (realpart c) 'double-float)
 ;; 	    (get-slot-value complex 'r-complex) 'i) (coerce (imagpart c) 'double-float)))
-      (setf (alien:slot complex 'r) (coerce (realpart c) 'double-float)
-	    (alien:slot complex 'i) (coerce (imagpart c) 'double-float)))
+      (setf (sb-alien:slot complex 'r) (coerce (realpart c) 'double-float)
+	    (sb-alien:slot complex 'i) (coerce (imagpart c) 'double-float)))
     robj))
 
 (defun string-to-robj (string)
@@ -590,6 +634,12 @@ real and imaginary points to double-float."
      (unwind-protect 
 	 (multiple-value-prog1 ,@body)
        (unprotect-args ,name))))
+
+(defmacro with-gensyms (syms &body body)
+  `(let (,@(mapcar (lambda (sy)
+		     `(,sy (gensym ,(symbol-name sy))))
+		   syms))
+    ,@body))
 
 (defmacro r (name &rest args)
   "The primary user interface to rclg.  Converts all the arguments into
@@ -778,14 +828,17 @@ Useful for re-using the &REST arg after removing some options."
 
 ;; This is necessary because CMU's traps modes cause error upon
 ;; R startup.
-#+cmu
+#+sbcl
 (eval-when (:load-toplevel)
-  (let ((current-traps (cadr (member :traps (ext:get-floating-point-modes)))))
-    (when (find :invalid current-traps)
-      (progn
-	(warn "WARNING: removing :invalid from floating-point-modes traps.")
-	(ext:set-floating-point-modes :traps 
-				      (remove :invalid current-traps))))))
+  (sb-int:set-floating-point-modes :traps (list :overflow)))
+
+;; (eval-when (:load-toplevel)
+;;   (let ((current-traps (cadr (member :traps (sb-int:get-floating-point-modes)))))
+;;     (when (find :invalid current-traps)
+;;       (progn
+;; 	(warn "WARNING: removing :invalid from floating-point-modes traps.")
+;; 	(sb-int:set-floating-point-modes :traps 
+;; 					 (remove :invalid current-traps))))))
 
 
 (eval-when (:load-toplevel)
@@ -796,4 +849,4 @@ Useful for re-using the &REST arg after removing some options."
   (mp:make-process (lambda () (do () (nil) (progn (update-r) (sleep 0.1))))))
 
 (defmacro uffi::get-slot-value (obj type slot)
-  `(alien:slot ,obj ,slot))
+  `(sb-alien:slot ,obj ,slot))
