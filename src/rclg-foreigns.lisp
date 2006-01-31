@@ -3,7 +3,8 @@
   (:export :%set-tag :%rf-length :%set-vector-elt :%vector-elt
 	   :%rf-elt :%rf-coerce-vector :%rf-alloc-vector
 	   :%rf-protect :%rf-unprotect :%rf-unprotect-ptr
-	   :%rf-init-embedded-r :%rf-find-var :%rf-install :%r-try-eval
+	   :%rf-init-embedded-r :%rf-find-var :%rf-find-fun
+	   :%rf-install :%r-try-eval
 	   :%rf-get-attrib :%rf-set-attrib
 	   :%LOGICAL :%INT :%REAL :%COMPLEX 
 	   :%rf-mkchar :%set-string-elt
@@ -73,6 +74,10 @@
 
 
 (defcfun ("Rf_findVar" %rf-find-var) sexp
+  (installed sexp)
+  (environment sexp))
+
+(defcfun ("Rf_findFun" %rf-find-fun) sexp
   (installed sexp)
   (environment sexp))
 

@@ -5,6 +5,11 @@
 
 (in-package :rclg-control)
 
+(eval-when (:compile-toplevel :load-toplevel)
+  (defmacro with-r-traps (&body body)
+    `(sb-int:with-float-traps-masked  (:invalid :divide-by-zero)
+      ,@body)))
+
 (defun rname-to-robj (name)
   "If R has a mapping for name (name is a string), returns the SEXP
 that points to it, otherwise returns NIL."
@@ -15,23 +20,34 @@ that points to it, otherwise returns NIL."
 	  foreign-value
 	  nil))))
 
+(defun rname-to-rfun (name)
+  "If R has a mapping for name (name is a string), returns the SEXP
+that points to it, otherwise returns NIL."
+  (and (rname-to-robj name)
+       (with-foreign-string (ident-foreign name)
+	 (let ((foreign-value
+		(%rf-find-fun (%rf-install ident-foreign) *r-global-env*)))
+	   (if (r-bound foreign-value)
+	       foreign-value
+	       nil)))))
+
 (defun sexp-length (args)
   (+ 1 (length args) (- (count-keywords args))))
 
 (defun count-keywords (args)
   (count-if #'keywordp args))
 
-(defun r-call (name args)
+(defun r-call (name &rest args)
   "Does the actual call to R.  r-call converts args into R objects.
 Returns an unprotected, unconverted R object."
-  (let ((func (rname-to-robj name)))
+  (let ((func (rname-to-rfun name)))
     (if (not func)
 	(error "Cannot find function ~A" name)      
 	(let ((exp (%rf-protect 
 		    (%rf-alloc-vector #.(sexp-elt-type :langsxp) (sexp-length args)))))
 	  (r-setcar exp func)
 	  (parse-args (r-cdr exp) args)
-	  (prog1 (r-eval exp)
+	  (prog1 (with-r-traps (r-eval exp))
 	    (%rf-unprotect 1))))))  ;; r-call
 
 
@@ -80,7 +96,7 @@ Returns an unprotected, unconverted R object."
     "The primary interface to RCLG.  Backconverts the answer.  Name can
 be a symbol or string."  
     (with-gensyms (evaled names dims result)
-      `(let ((,evaled (r-call (get-name ,name) ',args)))
+      `(let ((,evaled (r-call (get-name ,name) ,@args)))
 	(let ((,result (convert-from-r ,evaled))
 	      (,names (r-names ,evaled))
 	      (,dims (r-dims ,evaled)))
@@ -91,7 +107,7 @@ be a symbol or string."
 
 (defmacro rnb (name &rest args)
   "Calls R, but returns the unevaled R object.  Doesn't protect it."
-  `(r-call (get-name ,name) ',args))
+  `(make-instance 'sexp-holder :sexp (r-call (get-name ,name) ,@args)))
 
 (defun r-names (robj)  
   (let ((names (%rf-get-attrib robj *r-names-symbol*)))
@@ -103,9 +119,12 @@ be a symbol or string."
     (unless (r-nil dims)
       (convert-from-r dims))))
 
+
 (defun update-R ()
-  (%r-run-handlers *r-input-handlers*
-		   (%r-check-activity 10000 0)))
+  (with-r-traps
+      (%r-run-handlers *r-input-handlers*
+		       (%r-check-activity 10000 0))))
+
 
 (defun get-r-error ()
   (r geterrmessage))
