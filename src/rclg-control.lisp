@@ -1,14 +1,9 @@
 (defpackage :rclg-control
   (:use :common-lisp :cffi :rclg-types :rclg-foreigns :rclg-access
-	:rclg-convert :rclg-util)
-  (:export :r :rnb :update-r))
+	:rclg-init :rclg-convert :rclg-util)
+  (:export :r :rnb))
 
 (in-package :rclg-control)
-
-(eval-when (:compile-toplevel :load-toplevel)
-  (defmacro with-r-traps (&body body)
-    `(sb-int:with-float-traps-masked  (:invalid :divide-by-zero)
-      ,@body)))
 
 (defun rname-to-robj (name)
   "If R has a mapping for name (name is a string), returns the SEXP
@@ -54,11 +49,12 @@ Returns an unprotected, unconverted R object."
 (defun r-eval (expr)
   "Evaluate an R expression."
   (with-foreign-object (e :int)
-    (setf (mem-ref e :int) 0)
-    (let ((res (%r-try-eval expr *r-global-env* e)))
-      (if (not (= (mem-ref e :int) 0))
-	  (error "Bad expr: ~A" (get-r-error))
-	  res))))
+    (with-r-mutex
+      (setf (mem-ref e :int) 0)
+      (let ((res (%r-try-eval expr *r-global-env* e)))
+	(if (not (= (mem-ref e :int) 0))
+	    (error "Bad expr: ~A" (get-r-error))
+	    res)))))
 
 (defun parse-args (exp args)
   (do ((arglist args (cdr arglist)))
@@ -72,7 +68,7 @@ Returns an unprotected, unconverted R object."
       (setf exp (r-cdr exp)))))
 
 (defun parse-keyword (exp kwd arg)
-  (r-setcar exp arg)
+  (r-setcar exp (convert-to-r arg))
   (with-foreign-string (f (string-downcase (symbol-name kwd)))
     (%set-tag exp (%rf-install f))))
 
@@ -120,10 +116,6 @@ be a symbol or string."
       (convert-from-r dims))))
 
 
-(defun update-R ()
-  (with-r-traps
-      (%r-run-handlers *r-input-handlers*
-		       (%r-check-activity 10000 0))))
 
 
 (defun get-r-error ()

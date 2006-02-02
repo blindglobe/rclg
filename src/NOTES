@@ -13,5 +13,6 @@ Consolidate with-gensyms somewhere?
 We only get r-names and r-dims back at the "toplevel" call to r.
 Should rnb protect?  Don't think we're using poss-sexp for anything...
 
-with-r-traps is SBCL specific.
-Need to include multiprocessing.
+with-r-traps is SBCL specific.  
+Multiprocessing stuff (with mutex) is SBCL specific.
+
