@@ -49,12 +49,13 @@ Returns an unprotected, unconverted R object."
 (defun r-eval (expr)
   "Evaluate an R expression."
   (with-foreign-object (e :int)
-    (with-r-mutex
-      (setf (mem-ref e :int) 0)
-      (let ((res (%r-try-eval expr *r-global-env* e)))
-	(if (not (= (mem-ref e :int) 0))
-	    (error "Bad expr: ~A" (get-r-error))
-	    res)))))
+    (let ((res
+	   (with-r-mutex
+	     (setf (mem-ref e :int) 0)
+	     (%r-try-eval expr *r-global-env* e))))
+      (if (not (= (mem-ref e :int) 0))
+	  (error "Bad expr: ~A" (get-r-error))
+	  res))))
 
 (defun parse-args (exp args)
   (do ((arglist args (cdr arglist)))
@@ -114,9 +115,6 @@ be a symbol or string."
   (let ((dims (%rf-get-attrib robj *r-dims-symbol*)))
     (unless (r-nil dims)
       (convert-from-r dims))))
-
-
-
 
 (defun get-r-error ()
   (r geterrmessage))

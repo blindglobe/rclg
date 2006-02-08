@@ -16,3 +16,5 @@ Should rnb protect?  Don't think we're using poss-sexp for anything...
 with-r-traps is SBCL specific.  
 Multiprocessing stuff (with mutex) is SBCL specific.
 
+In R, memory.c contains allocVector.  Looks like it *should* be doable
+to directly pass vectors around (non-portably, of course).
