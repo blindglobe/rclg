@@ -1,5 +1,6 @@
 ;;; Copyright Rif 2006
 
+;; test comment
 (defpackage :rclg-load
   (:use :common-lisp :osicat :cffi)
   (:export :load-r-libraries :*rclg-loaded*))
