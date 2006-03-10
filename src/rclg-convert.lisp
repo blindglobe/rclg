@@ -1,13 +1,24 @@
+;;; RCLG: R-CommonLisp Gateway
+
+;;; Copyright (c) --2006, rif@mit.edu.  All Rights Reserved.
+;;; Author: rif@mit.edu
+;;; Maintainers: rif@mit.edu, AJ Rossini <blindglobe@gmail.com>
+;;; License:
+
+;;; Intent: Conversion between R objects (technically, R SEXPs, which
+;;; are pointers to functions).  Should converted R objects maintain a
+;;; link to their source (and hence need to be flagged for GC, etc)?
+
 (defpackage :rclg-convert
-  (:use :common-lisp :cffi :rclg-util :rclg-types :rclg-foreigns)
+  (:use :common-lisp :cffi
+	:rclg-util :rclg-types :rclg-foreigns)
   (:export :*r-na* :convert-to-r :convert-from-r :r-bound :r-nil))
 
 (in-package :rclg-convert)
 
 (eval-when (:compile-toplevel :load-toplevel)
   (defvar *r-NA-internal* -2147483648) ;;  PLATFORM SPECIFIC HACK!!!
-  (defvar *r-na* 'r-na)
-  )
+  (defvar *r-na* 'r-na))
 
 ;;; Basic Conversion Routines
 (defun robj-to-int (robj &optional (i 0))
@@ -127,14 +138,12 @@ a copy.  At least, I hope it does."
   (defvar +complex-seq+ 3)
   (defvar +string-seq+ 4)
   (defvar +any-seq+ 0)
-  
+
   (defvar +seq-fsm+ #2A((0 0 0 0 0)
 			(0 1 2 3 0)
 			(0 2 2 3 0)
 			(0 3 3 3 0)
-			(0 0 0 0 4)))
-  )
-
+			(0 0 0 0 4))))
 
 (defun type-to-int (obj)
   (cond ((eql obj *r-na*) +int-seq+)
@@ -179,7 +188,8 @@ a copy.  At least, I hope it does."
 
 
 (defun convert-from-r (robj)
-  "Attempt to convert a general R value to a CL value."
+  "Attempt to convert a general R value to a CL value.
+FIXME:AJR: what should happen upon failure?"
   (if (r-nil robj)
       nil
     (let ((length (%rf-length robj)))
@@ -192,7 +202,8 @@ a copy.  At least, I hope it does."
 
 (defun sexptype-to-element-type (type)
   (case type
-    (#.(sexp-elt-type :intsxp) 'integer) ;;; Sigh, not fixnum.
+    (#.(sexp-elt-type :intsxp) 'integer); Sigh, not fixnum.
+					; FIXME:AJR: Why not?
     (#.(sexp-elt-type :lglsxp) 'boolean)
     (#.(sexp-elt-type :realsxp) 'double-float)
     (#.(sexp-elt-type :cplxsxp) 'complex)
@@ -202,7 +213,7 @@ a copy.  At least, I hope it does."
     (t (error "Unknown type"))))
 
 (defun convert-from-r-seq (robj length)
-  "Convert an r-sequence into CL."
+  "Convert an R sequence into a CL array."
   (let* ((type (sexptype robj))
 	 (result (make-array length 
 			     :element-type (sexptype-to-element-type type))))
@@ -220,12 +231,12 @@ a copy.  At least, I hope it does."
     (values result type)))
 
 (defun r-bound (robj)
-  "Checks to see if an R SEXP is (has the address of) the
-*r-unbound-value* SEXP."
+  "Checks if an R SEXP is (has the address of) the *r-unbound-value*
+SEXP."
   (not (= (pointer-address robj) 
 	  (pointer-address *r-unbound-value*))))
 
 (defun r-nil (robj)
-  "Checks to see if an R SEXP is (has the address of) the *r-nil-value* SEXP."
+  "Checks if an R SEXP is (has the address of) the *r-nil-value* SEXP."
   (= (pointer-address robj)
      (pointer-address *r-nil-value*)))
