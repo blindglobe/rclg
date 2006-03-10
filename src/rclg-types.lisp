@@ -1,10 +1,19 @@
+;;; RCLG: R-CommonLisp Gateway
+
+;;; Copyright (c) --2006, rif@mit.edu.  All Rights Reserved.
+;;; Author: rif@mit.edu
+;;; Maintainers: rif@mit.edu, AJ Rossini <blindglobe@gmail.com>
+
+;;; Intent: Data structures in CommonLisp for representing R internal
+;;; data structures.
+
 (defpackage :rclg-types
   (:use :common-lisp :cffi)
   (:export :sexptype :sexp :sexp-elt-type :sexprec :sexp-holder
-	   :listsxp-struct :listsxp :cdrval :carval :sxp-int-union 
-	   :sexprec-internal-union
-	   :r-string :r-complex :r :i )
-  )
+	   :listsxp-struct :listsxp
+	   :cdrval :carval
+	   :sxp-int-union :sexprec-internal-union
+	   :r-string :r-complex :r :i ))
 
 (in-package :rclg-types)
 
@@ -15,12 +24,12 @@
   
   (defmacro def-voidptr-struct (struct-name &rest field-names)
     "Define a structure in which all elements are of type pointer-to-void."
-    `(def-typed-struct ,struct-name :pointer ,@field-names))
-  )
+    `(def-typed-struct ,struct-name :pointer ,@field-names)))
 
 
-;;;; R types
+;;; R types
 
+;; Taken from Rinternals.h
 ;; We probably only need a few of these, but as soon as I needed two, I 
 ;; decided to go ahead and type them all in.
 (defcenum sexptype 
@@ -63,11 +72,15 @@
 
 (defctype sexp :pointer)
 
-;;;; RCLG types
+;;; RCLG types
+
+;;; FIXME:AJR:  Can we use a FFI call as an alternative to return the
+;;; type?  It would be portable, but it would not be fast.  ARGH.
 (defun sexptype (robj)
-  "Gets the sexptype of an robj.  WARNING: ASSUMES THAT THE TYPE
-IS STORED IN THE LOW ORDER 5 BITS OF THE SXPINFO-STRUCT, AND THAT
-IT CAN BE EXTRACTED VIA A 'mod 32' OPERATION!  MAY NOT BE PORTABLE."
+  "Gets the sexptype of an robj.  WARNING: 
+ASSUMES THAT THE TYPE IS STORED IN THE LOW ORDER 5 BITS OF THE
+SXPINFO-STRUCT, AND THAT IT CAN BE EXTRACTED VIA A 'mod 32' OPERATION!
+MAY NOT BE PORTABLE."
   (let ((info (foreign-slot-value
 	       (foreign-slot-pointer robj 'sexprec 'sxpinfo)
 	       'sxpinfo-struct 'data)))
