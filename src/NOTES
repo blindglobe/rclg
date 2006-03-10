@@ -1,9 +1,20 @@
+-*- mode:text -*-
+
+
+* R SEXP
+
 rclg-types:sexptype
   "Gets the sexptype of an robj.  WARNING: ASSUMES THAT THE TYPE
 IS STORED IN THE LOW ORDER 5 BITS OF THE SXPINFO-STRUCT, AND THAT
 IT CAN BE EXTRACTED VIA A 'mod 32' OPERATION!  MAY NOT BE PORTABLE."
 
+* NAs
+
+
 (defvar *r-NA-internal* -2147483648) ;;  PLATFORM SPECIFIC HACK!!!
+
+
+* SBCL-specific hacks
 
 rclg-convert:sequence-to-robj is sbcl-specific!  Should think about
 removing rclg-helpers for more portability, if it's fast enough.
@@ -18,3 +29,13 @@ Multiprocessing stuff (with mutex) is SBCL specific.
 
 In R, memory.c contains allocVector.  Looks like it *should* be doable
 to directly pass vectors around (non-portably, of course).
+
+
+* FILES:
+
+rclg-access.lisp : low-level defuns for data transport between R SEXPs
+                   and CL. 
+rclg-types.lisp : structures and objects for R internal types
+rclg-control.lisp : primary interface to R evaluator
+rclg-load.lisp : initialize environment and load libraries.
+rclg-init.lisp : initialize and maintain the R evaluator process. 
