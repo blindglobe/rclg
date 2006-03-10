@@ -1,3 +1,13 @@
+;;; RCLG: R-CommonLisp Gateway
+
+;;; Copyright (c) --2006, rif@mit.edu.  All Rights Reserved.
+;;; Author: rif@mit.edu
+;;; Maintainers: rif@mit.edu, AJ Rossini <blindglobe@gmail.com>
+;;; License: 
+
+;;; Intent: This code provides access to libR functions and variables,
+;;; wrapping them using CFFI.
+
 (defpackage :rclg-foreigns
   (:use :common-lisp :cffi :rclg-load :rclg-types)
   (:export :%set-tag :%rf-length :%set-vector-elt :%vector-elt
@@ -15,9 +25,7 @@
 
 (in-package :rclg-foreigns)
 
-  
-
-
+;; we can't do anything else until the R libraries are loaded.
 (eval-when (:load-toplevel)
   (unless *rclg-loaded*
     (error "rclg-load has not loaded the R libraries.")))
@@ -56,8 +64,8 @@
 
 ;; def-function doesn't take a docstring!  "'Protects' the item
 ;; (presumably by telling the garbage collector it's in use, although
-;; I haven't looked at the internals.  Returns the same pointer you
-;; give it."
+;; I(rif) haven't looked at the internals.  Returns the same pointer you
+;; give it.)"
 (defcfun ("Rf_protect" %rf-protect) sexp
   (s sexp))
 
@@ -102,7 +110,6 @@
 (defcfun ("INTEGER" %INT) :pointer (e sexp))
 (defcfun ("REAL" %REAL) :pointer (e sexp))
 
-
 (defcfun ("Rf_mkChar" %rf-mkchar) sexp
   (s r-string))
 
@@ -129,8 +136,7 @@
 (defcfun ("COMPLEX" %COMPLEX) :pointer
   (e sexp))
 
-
-;; R foreign variables
+;; libR foreign (global?) variables.
 
 (eval-when (:compile-toplevel :load-toplevel)
   (defmacro def-r-var (r-name cl-name)
@@ -143,7 +149,7 @@
 (def-r-var "R_NilValue" *r-nil-value*)
 (def-r-var "R_InputHandlers" *r-input-handlers*)
 
-;;;; Helpers
+;;; data to R conversion functions
 
 (defcfun ("doubleFloatVecToR" %double-float-vec-to-R) :void
   (d :pointer)
