@@ -1,3 +1,13 @@
+;;; RCLG: R-CommonLisp Gateway
+
+;;; Copyright (c) --2006, rif@mit.edu.  All Rights Reserved.
+;;; Author: rif@mit.edu
+;;; Maintainers: rif@mit.edu, AJ Rossini <blindglobe@gmail.com>
+
+;;; Intent: 
+
+
+
 (defpackage :rclg-control
   (:use :common-lisp :cffi :rclg-types :rclg-foreigns :rclg-access
 	:rclg-init :rclg-convert :rclg-util)
@@ -47,7 +57,7 @@ Returns an unprotected, unconverted R object."
 
 
 (defun r-eval (expr)
-  "Evaluate an R expression."
+  "raw R expression evaluation."
   (with-foreign-object (e :int)
     (let ((res
 	   (with-r-mutex
@@ -90,7 +100,7 @@ Returns an unprotected, unconverted R object."
 
 (eval-when (:compile-toplevel :load-toplevel)
   (defmacro r (name &rest args)
-    "The primary interface to RCLG.  Backconverts the answer.  Name can
+    "The primary RCLG interface.  Backconverts the answer.  Name can
 be a symbol or string."  
     (with-gensyms (evaled names dims result)
       `(let ((,evaled (r-call (get-name ,name) ,@args)))
@@ -99,8 +109,8 @@ be a symbol or string."
 	      (,dims (r-dims ,evaled)))
 	  (values (if ,dims (reshape-array ,result ,dims) 
 		      ,result)
-		  ,names)))))
-  )
+		  ,names))))))
+
 
 (defmacro rnb (name &rest args)
   "Calls R, but returns the unevaled R object.  Doesn't protect it."
