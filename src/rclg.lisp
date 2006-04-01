@@ -17,15 +17,19 @@
 	:rclg-init
 	:rclg-load
 	:rclg-types
-	:rclg-util
-	;; :uffi :rclg-load 
-	;; :common-idioms
-	)
-  (:export :start-r :rclg :r :sexp :*backconvert* :*r-started*
-	   :r-convert :r-do-not-convert :convert-to-r
-	   :sexp-not-needed :update-r :def-r-call :*r-NA* :r-na))
+	;; :uffi :rclg-load :common-idioms
+	:rclg-load
+	:rclg-util)
+  (:export start-rclg r *r-started*
+	   r-convert r-do-not-convert convert-to-r *backconvert* 
+	   sexp sexp-not-needed
+	   update-r def-r-call
+	   *r-NA* r-na
+	   r rnb))
 
 (in-package :rclg)
+
+
 
 ;;; Bunch of old crap lives here.  FIXME:AJR: Bunch of old crap used to live
 ;;; here, but it's restricted to the function below this comment.
@@ -46,4 +50,6 @@
   (:use :common-lisp
 	:rclg))
 
-(in-package :rclg-user)
+;; FIXME:AJR: not needed if we are not planning on working in this
+;; package.
+;;(in-package :rclg-user)
