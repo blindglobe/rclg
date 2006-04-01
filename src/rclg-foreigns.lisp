@@ -6,7 +6,9 @@
 ;;; License: 
 
 ;;; Intent: This code provides access to libR functions and variables,
-;;; wrapping them using CFFI.
+;;; wrapping them using CFFI.   Many of these should be exported to
+;;; other packages, but no exported over to a naive user (only to
+;;; developers and resulting code).
 
 (defpackage :rclg-foreigns
   (:use :common-lisp :cffi :rclg-load :rclg-types)
@@ -62,10 +64,10 @@
   (s sexptype)
   (n :int))
 
-;; def-function doesn't take a docstring!  "'Protects' the item
-;; (presumably by telling the garbage collector it's in use, although
-;; I(rif) haven't looked at the internals.  Returns the same pointer you
-;; give it.)"
+;; FIXME:AJR: def-function doesn't take a docstring!  
+;; The following "'Protects' the item (presumably by telling the
+;; garbage collector it's in use, although I(rif) haven't looked at
+;; the internals.  Returns the same pointer you give it.)"
 (defcfun ("Rf_protect" %rf-protect) sexp
   (s sexp))
 
@@ -149,7 +151,8 @@
 (def-r-var "R_NilValue" *r-nil-value*)
 (def-r-var "R_InputHandlers" *r-input-handlers*)
 
-;;; data to R conversion functions
+;;; data to R conversion functions -- found in ../c/rclg-helpers.c
+;; will only work if shared libraries are loaded.
 
 (defcfun ("doubleFloatVecToR" %double-float-vec-to-R) :void
   (d :pointer)
