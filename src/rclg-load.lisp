@@ -4,28 +4,32 @@
 ;;; Author: rif@mit.edu
 ;;; Maintainers: rif@mit.edu, AJ Rossini <blindglobe@gmail.com>
 
-;;; Intent: initialize environment stuff.
+;;; Intent: initialize environment stuff.  Purely developer level, no
+;;; user tools.
 
 (defpackage :rclg-load
   (:use :common-lisp :cffi :osicat)
-  (:export :load-r-libraries :*rclg-loaded*))
+  (:export load-r-libraries *rclg-loaded*))
 
 (in-package :rclg-load)
 
 (defvar *rclg-loaded* nil
   "True once rclg is loaded, nil while still loading.")
+
 (defvar *r-home*
   ;; #p"/home/rif/software/R-2.2.1/"
   #p"/usr/lib/R"
-  "This variable defines the r-home, need sto be configured by the
-user, or done via discovery.")
+  "This variable defines R-HOME (root installation directory).
+Needs to be configured by the user, or self-discovered.  See R docs
+for more details.")
 
 (defvar *r-ld-library-additions*
   '(#p"/usr/lib/R/lib"
-    #p":/usr/lib/R/library/grDevices/libs/"))
+    #p"/usr/lib/R/library/grDevices/libs/"))
 
-(concatenate 'string (mapcar #'namestring *r-ld-library-additions*))
-
+;; FIXME:AJR: (AJR needs more lisp-fu):
+;; ERROR - these are paths, not strings!
+;; (concatenate 'string (mapcar #'namestring *r-ld-library-additions*))
 
 ;; Set R_HOME environment variable using OSICAT
 (setf (environment-variable "R_HOME") (namestring *r-home*))
@@ -60,6 +64,8 @@ user, or done via discovery.")
   (t (:default "librclghelpers")))
 
 (define-foreign-library libR (t (:default "libR")))
+(define-foreign-library libRg (t (:default "grDevices")))
+
 
 ;; FIXME:AJR: Configuration issue: Figure out libR location from
 ;; R_HOME, and the RCLG location, and insert.  This is a hack. 
@@ -73,6 +79,7 @@ user, or done via discovery.")
 		  )
  		 *foreign-library-directories*)))
     (use-foreign-library libR)
+    (use-foreign-library libRg)
     ;;(use-foreign-library librclghelpers); put back in when we get it
 					; compiled. 
     (setf *rclg-loaded* t)))
