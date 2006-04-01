@@ -10,9 +10,11 @@
 
 (defpackage :rclg-access
   (:use :common-lisp :cffi :rclg-types)
-  (:export :r-setcar :r-car :r-cdr))
+  (:export r-setcar r-car r-cdr))
 
 (in-package :rclg-access)
+
+;;; Internal 
 
 (defun r-get-union (sexp)
   "returns a component of an R SEXP."
@@ -24,6 +26,8 @@
    (r-get-union sexp) 
    'sexprec-internal-union 
    'listsxp))
+
+;;; Exported
 
 (defun r-car (sexp)
   (foreign-slot-value (r-get-listsxp sexp) 'listsxp-struct 'carval))
