@@ -1,9 +1,22 @@
+;;; RCLG: R-CommonLisp Gateway
+
+;;; Copyright (c) --2006, rif@mit.edu.  All Rights Reserved.
+;;; Author: rif@mit.edu
+;;; Maintainers: rif@mit.edu, AJ Rossini <blindglobe@gmail.com>
+;;; License:
+
+;;; Intent: utility macros and functions.
+;;;
+
 (defpackage :rclg-util
   (:use :common-lisp)
-  (:export :with-gensyms :over-column-major-indices 
-	   :to-list :to-vector))
+  (:export with-gensyms  ;; for macro
+	   over-column-major-indices ;; prime export
+	   to-list to-vector)) ;; for macro.  But need to export?
 
 (in-package :rclg-util)
+
+;;; Export:
 
 (defmacro with-gensyms (syms &body body)
   `(let (,@(mapcar (lambda (sy)
@@ -33,4 +46,3 @@
 	   (let ((,cmi (apply #'array-row-major-index ,array ,index)))
 	     ,@body
 	     (,update-index ,index 0)))))))
-
