@@ -4,16 +4,16 @@
 ;;; Author: rif@mit.edu
 ;;; Maintainers: rif@mit.edu, AJ Rossini <blindglobe@gmail.com>
 
-;;; Intent: 
-
-
+;;; Intent: primary evaluation tool for R code; return values are R SEXPs. 
 
 (defpackage :rclg-control
   (:use :common-lisp :cffi :rclg-types :rclg-foreigns :rclg-access
 	:rclg-init :rclg-convert :rclg-util)
-  (:export :r :rnb))
+  (:export r rnb))
 
 (in-package :rclg-control)
+
+;;; Internal
 
 (defun rname-to-robj (name)
   "If R has a mapping for name (name is a string), returns the SEXP
@@ -55,6 +55,9 @@ Returns an unprotected, unconverted R object."
 	  (prog1 (with-r-traps (r-eval exp))
 	    (%rf-unprotect 1))))))  ;; r-call
 
+(defun get-r-error ()
+  ;;FIXME:AJR:  what does geterrmessage reference to?
+  (r geterrmessage))
 
 (defun r-eval (expr)
   "raw R expression evaluation."
@@ -98,24 +101,6 @@ Returns an unprotected, unconverted R object."
       (setf (row-major-aref result cmi) (aref old-array rmi)))
     result))
 
-(eval-when (:compile-toplevel :load-toplevel)
-  (defmacro r (name &rest args)
-    "The primary RCLG interface.  Backconverts the answer.  Name can
-be a symbol or string."  
-    (with-gensyms (evaled names dims result)
-      `(let ((,evaled (r-call (get-name ,name) ,@args)))
-	(let ((,result (convert-from-r ,evaled))
-	      (,names (r-names ,evaled))
-	      (,dims (r-dims ,evaled)))
-	  (values (if ,dims (reshape-array ,result ,dims) 
-		      ,result)
-		  ,names))))))
-
-
-(defmacro rnb (name &rest args)
-  "Calls R, but returns the unevaled R object.  Doesn't protect it."
-  `(make-instance 'sexp-holder :sexp (r-call (get-name ,name) ,@args)))
-
 (defun r-names (robj)  
   (let ((names (%rf-get-attrib robj *r-names-symbol*)))
     (unless (r-nil names)
@@ -126,5 +111,21 @@ be a symbol or string."
     (unless (r-nil dims)
       (convert-from-r dims))))
 
-(defun get-r-error ()
-  (r geterrmessage))
+;;; External 
+
+(eval-when (:compile-toplevel :load-toplevel)
+  (defmacro r (name &rest args)
+    "The primary RCLG interface.  Backconverts the answer.  Name can
+be a symbol or string.  VERIFY:AJR: args are function arguments."  
+    (with-gensyms (evaled names dims result)
+      `(let ((,evaled (r-call (get-name ,name) ,@args)))
+	(let ((,result (convert-from-r ,evaled))
+	      (,names (r-names ,evaled))
+	      (,dims (r-dims ,evaled)))
+	  (values (if ,dims (reshape-array ,result ,dims) 
+		      ,result)
+		  ,names))))))
+
+(defmacro rnb (name &rest args)
+  "Calls R, but returns the unevaled R object.  Doesn't protect it."
+  `(make-instance 'sexp-holder :sexp (r-call (get-name ,name) ,@args)))
