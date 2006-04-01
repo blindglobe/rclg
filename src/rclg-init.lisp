@@ -11,15 +11,15 @@
 ;;; But first things first.
 
 ;;; Basic Usage:
-;;; (start-rclg) ;; initializes RCLG functions.
-;;; 
+;; (start-rclg) ;; initializes RCLG functions.
+;; (update-R)   ;; sync all threads
+;;
 
 (defpackage :rclg-init
   (:use :common-lisp :rclg-foreigns :cffi)
-  (:export :start-rclg :with-R-traps :update-R 
-	   :start-rclg-update-thread 
-	   :stop-rclg-update-thread
-	   :with-r-mutex))
+  (:export start-rclg update-R 
+	   start-rclg-update-thread stop-rclg-update-thread 
+	   with-R-traps with-r-mutex))
 
 (in-package :rclg-init)
 
@@ -34,8 +34,7 @@
 
 #+sbcl
 (defmacro with-r-traps (&body body)
-  "Protect against R signaling wierdness.  This is mostly for
-initializing the R REPL."
+  "Protect against R signaling wierdness to initialize the R REPL."
   `(sb-int:with-float-traps-masked  (:invalid :divide-by-zero)
     ,@body))
 
@@ -55,8 +54,8 @@ not clear about the use-case for this macro."
 
 #+sbcl
 (defun start-rclg-update-thread ()
-  "Update R threads. FIXME:AJR add use case when/if this is needed at
-a user-level."
+  "Update R threads.
+FIXME:AJR add use case for when/if needed at by a user."
   (setf *do-rclg-updates-p* t)
   (sb-thread:make-thread 
    #'(lambda ()
@@ -111,7 +110,8 @@ need to check."
 		(%rf-init-embedded-r n foreign-argv))
 	      #+sbcl(start-rclg-update-thread))))))
 
-;;; Do we really want to force this, or should we wait and let the
-;;; user do this action? 
-(eval-when (:load-toplevel)
-  (start-rclg))
+;; Do we really want to force this, or should we wait and let the
+;; user do this action? 
+
+;;(eval-when (:load-toplevel)
+;;  (start-rclg))
