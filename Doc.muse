@@ -1,0 +1,57 @@
+
+* This documents the combination of Rif's and Cyrus's work for
+embedding R within CommonLisp 
+
+
+* General Approach
+
+
+** Tools to initialize R
+
+1. rclg-init : start-rclg update-R
+               start-rclg-update-thread stop-rclg-update-thread 
+	       with-R-traps with-r-mutex
+
+2. rclg-load : load-r-libraries  (FFI initializer, not FFI <-> CL specifier.
+
+3. clsr-loader: uffi-load-r-library (package: clsr)
+
+4. clsr : instantiates an R process.
+
+** Tools to handle R data structures and SEXPs in CL
+
+1. rclg-access  : r-setcar, r-car, r-cdr
+                  (R SEXP content <-> CL data)
+
+2. rclg-convert : convert-to-r, convert-from-r, *r-na*, r-nil, r-bound
+                  (data type and data conversion)
+
+3. rclg-types : SEXP data structure information.  exports types, print method.
+
+4. clsr-rref : High level R SEXP data structures and mappings
+
+5. clsr-sxp : SEXP data structures and mappings
+
+** Mappings:  Name (Function/variable), object registry
+
+1. rclg-control : r (internal: rname-to-robj, rname-to-rfun
+
+2. clsr-objects : tracks created R objects  in CL (reference counter).
+
+
+
+** R evaluation
+
+1. rclg-control : r (converts results),
+                  rnb (uneval'd R object, unprotected)
+
+1. rclg-parse-objects : tools to handle string commands.
+
+
+** internal FFI
+
+1. rclg-foreigns : maps libR to CL
+
+** CL tools (some R, some general)
+
+1. rclg-utils : with-gensyms, over-column-major-indices, to-list, to-vector
