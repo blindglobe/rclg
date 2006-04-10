@@ -154,11 +154,13 @@
 ;;; data to R conversion functions -- found in ../c/rclg-helpers.c
 ;; will only work if shared libraries are loaded.
 
+#+nil
 (defcfun ("doubleFloatVecToR" %double-float-vec-to-R) :void
   (d :pointer)
   (i :int)
   (s sexp))
 
+#+nil
 (defcfun ("intVecToR" %integer-vec-to-R) :void
   (d :pointer)
   (i :int)

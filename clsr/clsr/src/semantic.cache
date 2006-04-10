@@ -1,0 +1,39 @@
+;; Object src/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "src/"
+  :tables (list 
+   (semanticdb-table "clsr-loader.cl"
+    :major-mode 'lisp-mode
+    :tags '(("in-package" code nil nil [176 194]) ("uffi-load-r-library" function (:arguments ("lib")) nil [196 529]) ("uffi-load-r-library" code nil nil [531 559]))
+    :file "clsr-loader.cl"
+    :pointmax 562
+    )
+   (semanticdb-table "clsr-objects.cl"
+    :major-mode 'lisp-mode
+    :tags '(("in-package" code nil nil [190 208]) ("object-registry" type (:members (("ids" variable (:default-value "(make-hash-table)") nil nil) ("object-id-counter" variable nil nil nil) ("max-id" variable (:default-value "most-positive-fixnum") nil nil)) :type "class") nil [210 402]) ("get-object" function (:arguments ("registry")) nil [404 488]) ("set-object" function (:arguments ("object" "registry")) nil [490 595]) ("remove-id" function (:arguments ("registry")) nil [597 680]) ("next-id" function (:parent "object-registry" :arguments ("registry")) nil [682 981]) ("register-object" function (:arguments ("registry")) nil [983 1139]) ("unregister-id" function (:arguments ("registry")) nil [1141 1296]))
+    :file "clsr-objects.cl"
+    :pointmax 1302
+    )
+   (semanticdb-table "clsr-parse-eval.cl"
+    :major-mode 'lisp-mode
+    :tags '(("in-package" code nil nil [195 213]) ("%parse-r-command" function (:arguments ("command-string")) nil [215 619]) ("assemble-r-parse" function (:arguments ("str")) nil [621 1091]) ("eval-r-command" function (:arguments ("command-string")) nil [1093 2097]) ("parse-r-expression" function (:arguments ("expression-string")) nil [2099 2568]) ("try-eval" function (:arguments ("expn-sexp")) nil [2570 3059]) ("with-parsed-r-expression" function (:arguments ("parsed" "&body" "body")) nil [3061 3795]) ("with-evaled-r-expression" function (:arguments ("evaled" "&body" "body")) nil [3797 4542]) ("with-r-call" function (:arguments ("answer" "&body" "body")) nil [4546 4774]))
+    :file "clsr-parse-eval.cl"
+    :pointmax 4775
+    )
+   (semanticdb-table "clsr-rref.cl"
+    :major-mode 'lisp-mode
+    :tags '(("in-package" code nil nil [206 224]) ("matrix-dim" function (:arguments ("matsxp")) nil [226 330]) ("def-typed-rref" function (:arguments ("name" "r-type-fun" "lisp-type")) nil [332 1504]) ("def-typed-rref" code nil nil [1506 1555]) ("def-typed-rref" code nil nil [1556 1616]) ("def-typed-rref" code nil nil [1617 1667]) ("complex-rref" function (:arguments ("matsxp" "y" "x")) nil [1791 1947]) ("defparameter" code nil nil [2124 2183]) ("dolist" code nil nil [2184 2442]) ("defparameter" code nil nil [2444 2508]) ("dolist" code nil nil [2509 2768]) ("rref" function (:arguments ("matsxp" "y" "x")) nil [2770 2896]))
+    :file "clsr-rref.cl"
+    :pointmax 3046
+    )
+   (semanticdb-table "clsr.cl"
+    :major-mode 'lisp-mode
+    :tags '(("in-package" code nil nil [205 223]) ("define-condition" code nil nil [225 455]) ("defparameter" code nil nil [457 563]) ("*r-initialized*" variable nil nil [647 871]) ("sb-alien:define-alien-variable" code nil nil [1005 1097]) ("minus-one-as-unsigned-long" function (:arguments ("bits")) nil [1100 1171]) ("load-clsr-r-source-files" function nil nil [2296 2564]) ("deftype" code nil nil [2699 2825]) ("deftype" code nil nil [2840 2935]))
+    :file "clsr.cl"
+    :pointmax 2937
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0pre3"
+  :semanticdb-version "2.0pre3"
+  )

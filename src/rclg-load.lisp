@@ -7,8 +7,10 @@
 ;;; Intent: initialize environment stuff.  Purely developer level, no
 ;;; user tools.
 
+(asdf:oos 'asdf:load-op 'cffi)
+
 (defpackage :rclg-load
-  (:use :common-lisp :cffi :osicat)
+  (:use :common-lisp :cffi);  :osicat)
   (:export load-r-libraries *rclg-loaded*))
 
 (in-package :rclg-load)
@@ -16,46 +18,58 @@
 (defvar *rclg-loaded* nil
   "True once rclg is loaded, nil while still loading.")
 
-(defvar *r-home*
+(defvar *r-home*  ;; change to *r-home* path?   What should be done here?
   ;; #p"/home/rif/software/R-2.2.1/"
-  #p"/usr/lib/R"
+  ;; #p"/opt/Rdevel"
+  ;; #p"/usr/lib/R"
+  (pathname "/usr/lib/R")
   "This variable defines R-HOME (root installation directory).
 Needs to be configured by the user, or self-discovered.  See R docs
 for more details.")
 
+;(defvar r-ld-library-additions-string
+;  ( ))
+
 (defvar *r-ld-library-additions*
-  '(#p"/usr/lib/R/lib"
-    #p"/usr/lib/R/library/grDevices/libs/"))
+;  '(#p"/usr/lib/R/lib"
+;    #p"/usr/lib/R/library/grDevices/libs/"))
+  (mapcar #'pathname (concatenate 'string
+				  (mapcar #'namestring r-ld-library-additions-string)
+				  #p"/opt/rdevel/lib/R/lib"
+    #p"/opt/rdevel/lib/R/library/grDevices/libs/")))
 
 ;; FIXME:AJR: (AJR needs more lisp-fu):
 ;; ERROR - these are paths, not strings!
 ;; (concatenate 'string (mapcar #'namestring *r-ld-library-additions*))
 
 ;; Set R_HOME environment variable using OSICAT
-(setf (environment-variable "R_HOME") (namestring *r-home*))
+;;(setf (environment-variable "R_HOME") (namestring *r-home*))
+;; FIXME:AJR: OSICAT + CFFI broken on recent SBCL's.
 
+
+
+;; Set Environmental Variables using CFFI
+(defcfun ("getenv" posix-getenv) :string
+  (envname :string))
+
+(defcfun ("setenv" posix-setenv) :int
+  (envname :string) (envval :string) (overwrite :int))
+
+;; now initialize environment
+(posix-setenv "R_HOME" (namestring *r-home*) 1)
+
+;; FIXME:AJR: yech.  This ought to be done properly, using paths
+;; rather than strings.  And it's my fault.
 #+nil
-(progn
-  ;; Set Environmental Variables using CFFI
-  (defcfun ("getenv" posix-getenv) :string
-    (envname :string))
-  
-  (defcfun ("setenv" posix-setenv) :int
-    (envname :string) (envval :string) (overwrite :int))
-  
-  ;; now initialize environment
-  (posix-setenv "R_HOME" (namestring *r-home*) 1)
+(posix-setenv "LD_LIBRARY_PATH"
+	      (concatenate 'string
+			   (posix-getenv "LD_LIBRARY_PATH")
+			   ":/usr/lib/R/lib"
+			   ":/usr/lib/R/library/grDevices/libs/"
+			   ":/home/rossini/public_html/CLS/CommonLispStat/CLS1.0A1.lisp/LispPackages/RCLG.svn/c/")
+	      1)
+#+nil(posix-setenv "R_SESSION_TEMPDIR" "/tmp/cls-scratch-0" 1) ; better default?
 
-  ;; FIXME:AJR: yech.  This ought to be done properly, using paths
-  ;; rather than strings.  And it's my fault.
-  (posix-setenv "LD_LIBRARY_PATH"
-		(concatenate 'string
-			     (posix-getenv "LD_LIBRARY_PATH")
-			     ":/usr/lib/R/lib"
-			     ":/usr/lib/R/library/grDevices/libs/")
-		1)
-  #+nil(posix-setenv "R_SESSION_TEMPDIR" "/tmp/cls-scratch-0" 1) ; better default?
-  )
   
 
 ;; Define and load foreign libraries
@@ -63,23 +77,68 @@ for more details.")
   (:unix (:or "librclghelpers.so.1.0"))
   (t (:default "librclghelpers")))
 
-(define-foreign-library libR (t (:default "libR")))
-(define-foreign-library libRg (t (:default "grDevices")))
+;;(define-foreign-library libR (t (:default "libR")))
+;;(define-foreign-library libRg (t (:default "grDevices")))
+(define-foreign-library libR (t (:default "/usr/lib/R/lib/libR")))
+(define-foreign-library libRg (t (:default "/usr/lib/R/library/grDevices/libs/grDevices")))
 
 
 ;; FIXME:AJR: Configuration issue: Figure out libR location from
 ;; R_HOME, and the RCLG location, and insert.  This is a hack. 
 ;; Load only if not loaded, don't want to clobber dynloads.
+#+nil
 (unless *rclg-loaded*
   (let ((*foreign-library-directories*
- 	 (append (list #p"/home/rossini/public_html/CLS/CommonLispStat/CLS1.0A1.lisp/LispPackages/RCLG/c/"
-		       #p"/usr/lib/R/lib/"
+ 	 (append (list #p"/home/rossini/public_html/CLS/CommonLispStat/CLS1.0A1.lisp/LispPackages/RCLG.svn/c/"
+		       #p"/opt/rdevel/lib/R/lib/"
+		       #p"/opt/rdevel/lib/R/library/grDevices/libs/"
+		       ;; #p"/usr/lib/R/lib/"
+		       ;; #p"/usr/lib/R/library/grDevices/libs/"
 		       ;; #p"/home/rif/Projects/RCLG/c/"
  		       ;; #p"/home/rif/software/R-2.2.1/lib/"
 		  )
  		 *foreign-library-directories*)))
     (use-foreign-library libR)
-    (use-foreign-library libRg)
+    #+nil(use-foreign-library libRg)
     ;;(use-foreign-library librclghelpers); put back in when we get it
 					; compiled. 
     (setf *rclg-loaded* t)))
+
+
+;;; Alternative approach -- but it barfs.
+(progn 
+  (posix-setenv "LD_LIBRARY_PATH"
+		(concatenate 'string
+			     ;; Default Debian
+			     ;;"/usr/lib/R/lib:"
+			     ;;"/usr/lib/R/library/grDevices/libs/:"
+			     ;; Verify, --prefix=/opt/rdevel
+			     "/opt/rdevel/lib:"
+			     "/opt/rdevel/lib/R/library/grDevices/libs/:"
+			     (posix-getenv "LD_LIBRARY_PATH"))
+		1)
+
+  (pushnew #P"/opt/rdevel/lib/R/lib/"
+           ;; #P"/usr/lib/R/lib/"
+	   *foreign-library-directories*
+	   :test #'equal)
+
+  (pushnew #P"/opt/rdevel/lib/R/library/grDevices/libs/"
+	   ;; #P"/usr/lib/R/library/grDevices/libs/"
+	   *foreign-library-directories*
+	   :test #'equal)
+
+  (define-foreign-library libR
+    (t (:default "libR")))
+
+  (use-foreign-library libR)
+
+  (define-foreign-library grDevices
+    (t (:default "grDevices")))
+
+  #+nil(use-foreign-library grDevices)
+
+  (setf *rclg-loaded* t))
+
+
+;; *rclg-loaded*

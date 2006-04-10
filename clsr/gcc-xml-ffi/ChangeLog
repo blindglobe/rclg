@@ -1,0 +1,204 @@
+2005-11-11  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-uffi.cl:
+	added a defgeneric for %make-forward-uffi-declaration
+
+2005-10-27  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl:
+	remove forward struct defintion (which was really a backward definition by mistake)
+	see if this breaks anything!
+
+2005-09-30  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* ChangeLog: bumped changelog
+
+	* src/gcc-xml-uffi.cl, src/gcc-xml-sb-alien.cl, src/gcc-xml-classes.cl:
+	... added some documentation
+	... added alignment-mixin
+	... added c-record type as parent of c-struct and c-union
+	... c-field now parses the offset of the <field> xml element
+	... added some in-place convert-to-alien-string functions
+	    and modified ones that return a new string to use these as
+	    inline functions
+	... added guess-alignment-from-offset
+	... added :alignment keyword to sb-alien struct declarations
+	... removed some debugging cruft
+	... changed struct-members and union-members calls to members
+
+2005-09-30  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-uffi.cl, src/gcc-xml-sb-alien.cl, src/gcc-xml-classes.cl:
+	... added some documentation
+	... added alignment-mixin
+	... added c-record type as parent of c-struct and c-union
+	... c-field now parses the offset of the <field> xml element
+	... added some in-place convert-to-alien-string functions
+	    and modified ones that return a new string to use these as
+	    inline functions
+	... added guess-alignment-from-offset
+	... added :alignment keyword to sb-alien struct declarations
+	... removed some debugging cruft
+	... changed struct-members and union-members calls to members
+
+2005-09-27  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-util.cl, src/gcc-xml-sb-alien.cl, src/gcc-xml-parse.cl, src/gcc-xml-classes.cl, TODO, ChangeLog:
+	... Making things work with mutually recursive structs that refer to
+	    each other via pointers. C doesn't allow struct A to contain a
+	    field that is struct B and vice versa, but it does allow A to
+	    contain a field that is a pointer to B and vice versa. Now, after
+	    much consternation and distres, it seems
+	... Added mock support for reference types. I don't think we do the
+	    right thing here, but we compile. This is bad, but there are worse
+	    problems that are still unfixed.
+	The code is really in a bit of a state and needs a serious rewrite,
+	    but it is at least working on carbon, quicktime and R for the
+	    moment.
+
+2005-08-28  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl, src/gcc-xml-classes.cl:
+	added convert-to-alien-signed-string
+	added %convert-to-alien-string macro, not sure which to use yet
+	added *null-char-ptr*
+	added make-sb-alien-declaration for c-func-type to generate the required
+	  declarations for c-func-types
+	use the mangled struct name if no name present
+	added get-required-types for c-array-type
+
+2005-08-28  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl, src/gcc-xml-classes.cl:
+	added convert-to-alien-signed-string
+	added %convert-to-alien-string macro, not sure which to use yet
+	added *null-char-ptr*
+	added make-sb-alien-declaration for c-func-type to generate the required
+	  declarations for c-func-types
+	use the mangled struct name if no name present
+	added get-required-types for c-array-type
+
+2005-08-28  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl, src/gcc-xml-classes.cl:
+	added convert-to-alien-signed-string
+	added %convert-to-alien-string macro, not sure which to use yet
+	added *null-char-ptr*
+	added make-sb-alien-declaration for c-func-type to generate the required
+	  declarations for c-func-types
+	use the mangled struct name if no name present
+	added get-required-types for c-array-type
+
+2005-08-26  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl: added convert-from-alien-pascal-string
+
+2005-08-25  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/defpackage.cl, src/gcc-xml-classes.cl, src/gcc-xml-sb-alien.cl, src/gcc-xml-uffi.cl, src/gcc-xml-util.cl, TODO:
+	lots of changes to support sb-alien stuff.
+	sb-alien enums now work
+	sb-alien function types work
+	fixed some order dependencies. This should all be cleaned up at some
+	point, but works better now.
+
+2005-08-08  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl, src/gcc-xml-classes.cl:
+	removed a debugging message
+	made enums use the sb-alien enum stuff properly
+	chase the required types for fields so that we get the proper (better?)
+	  order of declarations
+
+2005-08-06  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl:
+	reverting the enum stuff back to the old style for the time being.
+
+2005-08-05  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl:
+	added inline declamations for free-alien-string and convert-from-alien-string
+
+2005-08-04  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-sb-alien.cl:
+	working on sb-alien strings, structs and foreign variables.
+
+	* src/gcc-xml-sb-alien.cl:
+	added convert-to-alien-string, free-alien-string,
+	   and convert-from-alien-string
+	fixing up types for sb-alien stuff
+	added a few make-sb-alien-declaration functions
+
+	* src/gcc-xml-sb-alien.cl: baby steps...
+
+2005-08-03  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* ChangeLog, bootstrap.cl, gcc-xml-ffi-test.asd, gcc-xml-ffi.asd, src/gcc-xml-classes.cl, src/gcc-xml-sb-alien.cl, src/gcc-xml-uffi.cl, src/gcc-xml-util.cl, test/TODO, test/gcc-xml-test.cl:
+	lots of cleaning up and getting ready for gcc-xml-sb-alien
+
+2005-07-24  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* gcc-xml-ffi.asd, gcc-xml-ffi-test.asd: bumping version numbers
+
+2005-07-18  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-util.cl:
+	add an extra byte for NULL in null-terminated strings
+
+2005-07-18  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/gcc-xml-util.cl:
+	add an extra byte for NULL in null-terminated strings
+
+2005-07-06  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* gcc-xml-ffi.asd, gcc-xml-ffi-test.asd, bootstrap.cl:
+	gcc-xml-test -> gcc-xml-ffi-test
+	removed registry stuff
+
+2005-07-01  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* src/.cvsignore, test/.cvsignore: fixing cvsignores
+
+	* gcc-xml-ffi.asd, src/.cvsignore, test/.cvsignore:
+	added .cvsignore files and reference to LICENSE to asdf.
+
+	* README, LICENSE: added LICENSE and skeletal README
+
+	* ChangeLog, Makefile, README, bootstrap.cl, gcc-xml-ffi-test.asd, gcc-xml-ffi.asd:
+	more of the big reorg
+
+	* test/Makefile, test/README, test/TODO, test/auto-ffi-test.cl, test/c-test.c, test/defpackage.cl, test/gcc-xml-test.cl:
+	part of the big reorg
+
+	* TODO, src/defpackage.cl, src/gcc-xml-classes.cl, src/gcc-xml-parse.cl, src/gcc-xml-uffi.cl, src/gcc-xml-util.cl:
+	attempting to restructure things a bit...
+
+2005-06-14  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* TODO: Adding skeleton TODO file
+
+2005-05-16  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* gcc-xml-uffi.cl:
+	write-uffi-declarations-to-file now takes a :package argument
+
+2005-05-08  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* defpackage.cl, gcc-xml-classes.cl, gcc-xml-ffi.asd, gcc-xml-parse.cl, gcc-xml-uffi.cl, gcc-xml-util.cl:
+	Added foreign variable classes, parsing and declarations.
+
+2005-03-15  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* gcc-xml-uffi.cl: removed commented out stuff.
+	added write-uffi-declarations-to-file.
+
+2005-03-09  Cyrus Harmon  <cyrus@bobobeach.com>
+
+	* gcc-xml-test.cl: didn't need this here.
+
+	* README, TODO, bootstrap.cl, defpackage.cl, gcc-xml-classes.cl, gcc-xml-ffi.asd, gcc-xml-parse.cl, gcc-xml-test.cl, gcc-xml-uffi.cl, gcc-xml-util.cl:
+	moved files around a bit.
+

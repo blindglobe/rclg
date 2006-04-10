@@ -1,0 +1,33 @@
+Index: src/include/Defn.h
+===================================================================
+--- src/include/Defn.h	(revision 37490)
++++ src/include/Defn.h	(working copy)
+@@ -537,7 +537,7 @@
+ extern0 Rboolean R_KeepSource	INI_as(FALSE);	/* options(keep.source) */
+ extern0 int	R_UseNamespaceDispatch INI_as(TRUE);
+ extern0 int	R_WarnLength	INI_as(1000);	/* Error/warning max length */
+-extern0 uintptr_t R_CStackLimit	INI_as((uintptr_t)-1);	/* C stack limit */
++LibExtern uintptr_t R_CStackLimit	INI_as((uintptr_t)-1);	/* C stack limit */
+ extern0 uintptr_t R_CStackStart	INI_as((uintptr_t)-1);	/* Initial stack address */
+ extern0 int	R_CStackDir	INI_as(1);	/* C stack direction */
+ 
+Index: src/main/main.c
+===================================================================
+--- src/main/main.c	(revision 37490)
++++ src/main/main.c	(working copy)
+@@ -600,6 +600,7 @@
+     sa.sa_sigaction = sigactionSegv;
+     sigemptyset(&sa.sa_mask);
+     sa.sa_flags = SA_ONSTACK | SA_SIGINFO;
++    /*
+     sigaction(SIGSEGV, &sa, NULL);
+     sigaction(SIGILL, &sa, NULL);
+ #ifdef SIGBUS
+@@ -610,6 +611,7 @@
+     signal(SIGUSR1, onsigusr1);
+     signal(SIGUSR2, onsigusr2);
+     signal(SIGPIPE, SIG_IGN);
++    */
+ }
+ 
+ #else /* not sigaltstack and sigaction and sigemptyset*/
