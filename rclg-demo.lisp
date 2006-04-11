@@ -1,3 +1,4 @@
+;; -*- mode: slime -*-
 ;; What is this talk of 'release'? Klingons do not make software
 ;; 'releases'.  Our software 'escapes' leaving a bloody trail of
 ;; designers and quality assurance people in it's wake.
@@ -9,10 +10,13 @@
 ;; cases for using.
 
 ;(asdf:operate 'asdf:compile-op 'cffi)
-;(asdf:operate 'asdf:load-op 'cffi)
 ;(asdf:operate 'asdf:compile-op 'osicat)
 ;(asdf:operate 'asdf:load-op 'osicat)
-(asdf:operate 'asdf:compile-op 'rclg)
+;(asdf:operate 'asdf:compile-op 'rclg)
+
+;; if needed...?  Shouldn't be, since rclg.asd ought to take care of
+;; most of the issues that we have.
+;(asdf:operate 'asdf:load-op 'cffi)
 (asdf:operate 'asdf:load-op 'rclg)
 
 ;; We use the rclg-user package for work.  reasonable approach at this point. 
@@ -67,7 +71,6 @@
 ;; These worked
 (r "Sys.getenv" "LD_LIBRARY_PATH")
 (r "Sys.getenv" "LD_PRELOAD")
-
 
 (r "search") ;; works
 
@@ -148,7 +151,6 @@
 (rclg-control::rname-to-robj "library")
 
 ;;; Local variables:
-;;; mode: slime
 ;;; mode: outline-minor
 ;;; outline-header-prefix: ";;;"
 ;;; End:
