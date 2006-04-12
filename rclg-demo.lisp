@@ -1,4 +1,4 @@
-;; -*- mode: slime -*-
+
 ;; What is this talk of 'release'? Klingons do not make software
 ;; 'releases'.  Our software 'escapes' leaving a bloody trail of
 ;; designers and quality assurance people in it's wake.
@@ -28,6 +28,9 @@
 ;; rclg-init::*r-started*
 (start-rclg)
 ;; rclg-init::*r-started*
+
+(r "Cstack_info")
+
 
 ;; library problems are causing things to fail here.  By library
 ;; problems, I mean that there is a problem between GCC 4.0 and GCC
@@ -128,7 +131,9 @@
   (princ "Did we get here?"))
 
 
-(r "lm" 3)  ;; fails
+(r "lm" 3)  ;; fails and should
+;; (r "lm" :model "Y~X" :data ptrToDataFrame)
+
 
 (rclg-control::r-call "rnorm")
 
@@ -140,7 +145,6 @@
      :string
      :initial-contents '("rnorm")
      :null-terminated-p t))
-
 
 (r-bound Rtest-rnorm)
 

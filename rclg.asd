@@ -19,7 +19,9 @@
     ((:module src
       :serial t
       :components
-      ((:file "rclg-load")
+      ((:file "rclg-cffi-sysenv")
+       (:file "rclg-load"
+	      :depends-on ("rclg-cffi-sysenv"))
        (:file "rclg-types")
        (:file "rclg-util")
        (:file "rclg-foreigns"
