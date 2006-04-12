@@ -24,7 +24,7 @@
 (in-package :rclg-init)
 
 ;; initialization
-(defvar *r-default-argv* '("rclg" "-q" "--vanilla"))
+(defvar *r-default-argv* '("rclg" "-q" "--vanilla" "--max-ppsize=50000")) ; last term to incr stack
 (defvar *r-started* nil)
 
 ;; thread management
@@ -52,18 +52,21 @@ not clear about the use-case for this macro."
       (%r-run-handlers *r-input-handlers*
 		       (%r-check-activity 10000 0)))))
 
-#+sbcl
 (defun start-rclg-update-thread ()
   "Update R threads.
 FIXME:AJR add use case for when/if needed at by a user."
   (setf *do-rclg-updates-p* t)
+  #+sbcl
   (sb-thread:make-thread 
    #'(lambda ()
        (loop while *do-rclg-updates-p*
 	     do 
 	     (progn
 	       (update-R)
-	       (sleep *rclg-update-sleep-time*))))))
+	       (sleep *rclg-update-sleep-time*)))))
+  #+clisp(error "not implemented yet") 
+  #+cmu(error "not implemented yet"))
+
 
 
 (defun stop-rclg-update-thread ()
@@ -109,6 +112,8 @@ need to check."
 	      (with-foreign-string-array (foreign-argv n argv)
 		(%rf-init-embedded-r n foreign-argv))
 	      #+sbcl(start-rclg-update-thread))))))
+;; FIXME:AJR: above is silly -- ought to condition in function rather than here. 
+
 
 ;; Do we really want to force this, or should we wait and let the
 ;; user do this action? 

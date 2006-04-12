@@ -57,7 +57,8 @@ Returns an unprotected, unconverted R object."
 
 (defun get-r-error ()
   ;;FIXME:AJR:  what does geterrmessage reference to?
-  (r geterrmessage))
+  (r geterrmessage)
+  #+nil(princ "get-r-error: not implemented"))
 
 (defun r-eval (expr)
   "raw R expression evaluation."

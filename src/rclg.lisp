@@ -15,6 +15,7 @@
 	:rclg-convert
 	:rclg-foreigns
 	:rclg-init
+	:rclg-cffi-sysenv
 	:rclg-load
 	:rclg-types
 	;; :uffi :rclg-load :common-idioms
