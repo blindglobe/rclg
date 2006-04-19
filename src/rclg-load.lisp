@@ -61,10 +61,16 @@
       (defvar libr-location  (concatenate 'string *R-HOME-STR* "/lib/" "libR"))
       ;libr-location
       ;(stringp libr-location)
+
+      ;; I don't understand why I have to use explicit strings and paths?
       (define-foreign-library libR (t (:default "/opt/R-2-3-patches/lib/R/lib/libR")))
+      ;;(define-foreign-library libR (t (:default "libR")))
       (use-foreign-library libR)
       
       (define-foreign-library grDevices (t (:default "/opt/R-2-3-patches/lib/R/library/grDevices/libs/grDevices")))
+      ;;(define-foreign-library grDevices (t (:default "grDevices")))
+
+      ;; the following complains that it can't load libR, though we've already loaded it.  Sigh...
       #+nil(use-foreign-library grDevices)
       
       (setf *rclg-loaded* t))))
