@@ -1,9 +1,7 @@
 ;;;; -*- Mode: LISP; Syntax: ANSI-Common-Lisp; Base: 10 -*-
 
-(asdf:operate 'asdf:load-op 'cffi)
-
-;(asdf:operate 'asdf:load-op 'cffi-uffi-compat) ;; needed from OSICAT
-;(asdf:operate 'asdf:load-op 'osicat)
+;;; FIXME:AJR: if needed.
+;; (asdf:operate 'asdf:load-op 'cffi)
 
 (defpackage rclg-system
   (:use :common-lisp :asdf :cffi)) ; :osicat))
