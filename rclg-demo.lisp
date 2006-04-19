@@ -9,14 +9,11 @@
 ;; Basically, a scratch location, including example demos and test
 ;; cases for using.
 
-;(asdf:operate 'asdf:compile-op 'cffi)
-;(asdf:operate 'asdf:compile-op 'osicat)
-;(asdf:operate 'asdf:load-op 'osicat)
-;(asdf:operate 'asdf:compile-op 'rclg)
-
 ;; if needed...?  Shouldn't be, since rclg.asd ought to take care of
 ;; most of the issues that we have.
-;(asdf:operate 'asdf:load-op 'cffi)
+;(asdf:operate 'asdf:compile-op 'cffi)
+(asdf:operate 'asdf:load-op 'cffi)
+(asdf:operate 'asdf:compile-op 'rclg)
 (asdf:operate 'asdf:load-op 'rclg)
 
 ;; We use the rclg-user package for work.  reasonable approach at this point. 
