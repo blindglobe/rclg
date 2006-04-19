@@ -104,8 +104,15 @@ need to check."
 	     (mem-aref ,name :pointer ,ctr)))
 	  (foreign-free ,name))))))
 
+(defcvar "R_CStackLimit"  :unsigned-long)  ;; :unsigned long
+
+(defun r-turn-off-stack-checking ()
+  (setf R-CSTACKLIMIT -1))
+
+
 (defun start-rclg (&optional (argv *r-default-argv*))
   "Initial the first R thread, perhaps with different arguments."  
+  (r-turn-off-stack-checking)
   (unless *r-started*
     (progn
       #+sbcl(sb-int:set-floating-point-modes :traps (list :overflow))
