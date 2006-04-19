@@ -172,14 +172,22 @@ does."
 	  (i 0))
       (typecase seq 
 	((simple-array double-float)
-	 (%double-float-vec-to-R (sb-sys:vector-sap seq) len robj))
+	 (%double-float-vec-to-R
+	  #+sbcl(sb-sys:vector-sap seq) ;; Need CLISP/CMUCL replacements!
+	  #+cmu nil   ;; FIXME:AJR
+	  #+clisp nil ;; FIXME:AJR
+	  len robj))
 ;; 	 (map nil
 ;; 	      (lambda (e)
 ;; 		(%set-vector-elt robj i (double-float-to-robj e))
 ;; 		(incf i))
 ;; 	      seq))
 	((simple-array fixnum)
-	 (%integer-vec-to-R (sb-sys:vector-sap seq) len robj 4))
+	 (%integer-vec-to-R
+	  #+sbcl(sb-sys:vector-sap seq)
+	  #+cmu nil ;; FIXME:AJR
+	  #+clisp nil ;; FIXME:AJR
+	  len robj 4))
 	(t 
 	 (map nil
 	      (lambda (e)

@@ -28,9 +28,13 @@
 (in-package :rclg-foreigns)
 
 ;; we can't do anything else until the R libraries are loaded.
+
+
 (eval-when (:load-toplevel)
-  (unless *rclg-loaded*
-    (error "rclg-load has not loaded the R libraries.")))
+  (progn
+    (load-r-libraries)
+    (unless *rclg-loaded*
+      (error "rclg-load has not loaded the R libraries."))))
 
 ;;; R library foreigns
 

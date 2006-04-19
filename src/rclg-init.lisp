@@ -30,7 +30,10 @@
 ;; thread management
 (defvar *do-rclg-updates-p* nil)
 (defvar *rclg-update-sleep-time* .1)
-(defvar *rclg-update-mutex* (sb-thread:make-mutex))
+(defvar *rclg-update-mutex*
+  #+sbcl(sb-thread:make-mutex)
+  #-sbcl nil
+  )
 
 #+sbcl
 (defmacro with-r-traps (&body body)
@@ -101,7 +104,6 @@ need to check."
 	     (mem-aref ,name :pointer ,ctr)))
 	  (foreign-free ,name))))))
 
-
 (defun start-rclg (&optional (argv *r-default-argv*))
   "Initial the first R thread, perhaps with different arguments."  
   (unless *r-started*
@@ -112,11 +114,11 @@ need to check."
 	      (with-foreign-string-array (foreign-argv n argv)
 		(%rf-init-embedded-r n foreign-argv))
 	      #+sbcl(start-rclg-update-thread))))))
-;; FIXME:AJR: above is silly -- ought to condition in function rather than here. 
 
-
-;; Do we really want to force this, or should we wait and let the
-;; user do this action? 
+;; FIXME:AJR: Do we really want to force this, or should we wait and
+;; let the user do this when appropriate?
 
 ;;(eval-when (:load-toplevel)
 ;;  (start-rclg))
+
+
