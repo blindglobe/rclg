@@ -36,12 +36,15 @@
 ;;       '(("**;*.*.*"
 ;; 	 "/opt/R-2-3-patches/lib/R/lib/**/")))
 
-(defvar *R-HOME-STR* 
-  ;;  "/opt/R-2-2-patches/lib/R" ;; root is /opt/R-2-2-patches/
-  "/opt/R-2-3-patches/lib/R" ;; root is /opt/R-2-3-patches/
-  ;;  "/opt/rdevel/lib/R"        ;; root is /opt/rdevel/
-  ;;  "/usr/lib/R/"             ;; root is /usr/
-  )
+(eval-when (:compile-toplevel :load-toplevel)
+  (defvar *R-HOME-STR* 
+    ;;  "/opt/R-2-2-patches/lib/R" ;; root is /opt/R-2-2-patches/
+    ;; "/opt/R-2-3-patches/lib/R" ;; root is /opt/R-2-3-patches/
+    ;;  "/opt/rdevel/lib/R"        ;; root is /opt/rdevel/
+    ;;  "/usr/lib/R/"             ;; root is /usr/
+    "/home/rif/RCLG-test/R-2.3.1"
+    ))
+
 ; *R-HOME-STR*
 
 (defvar *R-CORE-LIB-DIRS* (list (concatenate 'string *R-HOME-STR* "/lib")
@@ -63,11 +66,13 @@
       ;(stringp libr-location)
 
       ;; I don't understand why I have to use explicit strings and paths?
-      (define-foreign-library libR (t (:default "/opt/R-2-3-patches/lib/R/lib/libR")))
+      ;; TODO:  Figure out a way to get rid of explicit strings here (rif)
+      ;; DOES THIS #. work?  (rif)
+      (define-foreign-library libR (t (:default #.(concatenate 'string *R-HOME-STR* "/lib/libR"))))
       ;;(define-foreign-library libR (t (:default "libR")))
       (use-foreign-library libR)
       
-      (define-foreign-library grDevices (t (:default "/opt/R-2-3-patches/lib/R/library/grDevices/libs/grDevices")))
+      (define-foreign-library grDevices (t (:default #.(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/grDevices"))))
       ;;(define-foreign-library grDevices (t (:default "grDevices")))
 
       ;; the following complains that it can't load libR, though we've already loaded it.  Sigh...
@@ -77,3 +82,4 @@
 
   
   ;; *rclg-loaded*
+  

@@ -44,7 +44,7 @@
 #+sbcl
 (defmacro with-r-mutex (&body body)
   "FIXME:AJR: eval body in an mutex thread, updating as necessary.  AJR is
-not clear about the use-case for this macro."  
+not clear about the use-case for this macro."   
   `(sb-thread:with-mutex (*rclg-update-mutex*)
     ,@body))
 
@@ -69,7 +69,6 @@ FIXME:AJR add use case for when/if needed at by a user."
 	       (sleep *rclg-update-sleep-time*)))))
   #+clisp(error "not implemented yet") 
   #+cmu(error "not implemented yet"))
-
 
 
 (defun stop-rclg-update-thread ()
@@ -105,14 +104,25 @@ need to check."
 	  (foreign-free ,name))))))
 
 (defcvar "R_CStackLimit"  :unsigned-long)  ;; :unsigned long
+(defcvar "R_SignalHandlers" :unsigned-long) ;; :unsigned long
 
 (defun r-turn-off-stack-checking ()
-  (setf R-CSTACKLIMIT -1))
+  (setf *R-SIGNALHANDLERS* 0)
+  (setf *R-CSTACKLIMIT* 4294967295)
+  )
+  ;; (setf *R-CSTACKLIMIT* -1))
+
+
+(defun check-stack ()
+  (format t "STACK: LIMIT ~A, HANDLERS ~A~%" 
+	  *R-CSTACKLIMIT* *R-SIGNALHANDLERS*)
+  (force-output t))
 
 
 (defun start-rclg (&optional (argv *r-default-argv*))
   "Initial the first R thread, perhaps with different arguments."  
   (r-turn-off-stack-checking)
+  (check-stack)
   (unless *r-started*
     (progn
       #+sbcl(sb-int:set-floating-point-modes :traps (list :overflow))
@@ -120,8 +130,10 @@ need to check."
 	    (progn
 	      (with-foreign-string-array (foreign-argv n argv)
 		(%rf-init-embedded-r n foreign-argv))
-	      #+sbcl(start-rclg-update-thread))))))
-
+	      #+sbcl(start-rclg-update-thread)))))
+  (check-stack)
+  (r-turn-off-stack-checking))
+  
 ;; FIXME:AJR: Do we really want to force this, or should we wait and
 ;; let the user do this when appropriate?
 

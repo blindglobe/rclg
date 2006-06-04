@@ -15,7 +15,9 @@
   (:export :%set-tag :%rf-length :%set-vector-elt :%vector-elt
 	   :%rf-elt :%rf-coerce-vector :%rf-alloc-vector
 	   :%rf-protect :%rf-unprotect :%rf-unprotect-ptr
-	   :%rf-init-embedded-r :%rf-find-var :%rf-find-fun
+	   :%rf-init-embedded-r :%rf-initialize-r
+	   :%setup-r-main-loop
+	   :%rf-find-var :%rf-find-fun
 	   :%rf-install :%r-try-eval
 	   :%rf-get-attrib :%rf-set-attrib
 	   :%LOGICAL :%INT :%REAL :%COMPLEX 
@@ -86,6 +88,11 @@
   (argc :int)
   (argv :pointer))
 
+(defcfun ("Rf_initialize_R" %rf-initialize-r) :int
+  (argc :int)
+  (argv :pointer))
+
+(defcfun ("setup_Rmainloop" %setup-r-main-loop) :void)
 
 (defcfun ("Rf_findVar" %rf-find-var) sexp
   (installed sexp)

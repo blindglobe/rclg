@@ -3,8 +3,9 @@
 ;;; FIXME:AJR: if needed.
 ;; (asdf:operate 'asdf:load-op 'cffi)
 
+;; RIF: Removed :cffi from :use'd packages here
 (defpackage rclg-system
-  (:use :common-lisp :asdf :cffi)) ; :osicat))
+  (:use :common-lisp :asdf)) ; :osicat))
 
 (in-package :rclg-system)
 

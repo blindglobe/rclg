@@ -91,7 +91,7 @@ DESCRIPTION
 
 (defctype rlim_t :int
   :documentation "numbers describing range limits")
-
+  
 (defcstruct rlimitStruct
    (rlim_cur rlim_t)  ;; soft limit
    (rlim_max rlim_t)) ;; hard limit

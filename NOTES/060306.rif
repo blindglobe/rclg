@@ -1,0 +1,49 @@
+1.  In the current version of cffi, the variable names get wrapped in
+asterisks, so
+
+(defcvar "R_CStackLimit"  :unsigned-long)  ;; :unsigned long
+(defcvar "R_SignalHandlers" :unsigned-long) ;; :unsigned long
+
+make variables named *R-CSTACKLIMIT* and *R-SIGNALHANDLERS*
+
+2. In your "rclg-demo.lisp", I found
+
+(rnb "rnorm") ;; call without blocking or protecting anything.
+
+I wanted to mention that rnb doesn't mean "no blocking", it means "no
+backconverting".  It's not that it doesn't protect --- it does all the
+normal protection, it just doesn't convert the result back from R to
+Lisp.  It's to avoid pushing big objects back and forth through the
+pipe needlessly.  In some sense, rnb is what you'd use to do an R
+assignment, but you get a CL name for whatever it is rather than an R
+name.
+
+3.  At this point, it seems like setting *R-SIGNALHANDLERS* to 0 is
+preventing an immediate seg fault.  So that's good.
+
+4.  We are still getting errors related to the stack, and I can't
+actually *find* anything.  Whenever I try to find a function, I'm
+getting back "Unbound value".  I don't know for sure that this is
+related to the stack problems.  The equivalent C program does find
+things.  I've put the C and Lisp programs in subdirectory simple-test.
+I'm not sure whether want to be using Rf_findVar or Rf_findFun.
+
+5.  I'm not sure 100% I'm handling the stack correctly.  On the
+mailing list, it suggests setting R_CStackLimit = -1.  However, CFFI
+believes that *R-CSTACKLIMIT* is an unsigned long, and won't let me set
+it to -1.  I'm seting it to the two's complement value, which is
+429476295.  I think this is OK, but tell me if it isn't.
+
+6.  It is worth noting that Rf_initEmbeddedR *will* change the value
+of R_CStackLimit.  So it is important to set signalhandlers to 0
+BEFORE starting R, and then probably set StackLimit afterwards.  I've
+played a bit with going into the R source and turning off the stuff in
+the initialization that sets it to some value, but that produced an
+infinite loop of stack checks.
+
+7.  I had to make a bunch of changes so that all the built-in file
+constants match my directory structure.  I think it's set up so you
+only have to change the path in one place now (the defvar of
+*R-HOME-STR* in rclg-load).
+
+I'm saving this file as NOTES/06032006.rif
