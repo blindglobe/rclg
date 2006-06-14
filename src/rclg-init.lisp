@@ -106,8 +106,10 @@ need to check."
 (defcvar "R_CStackLimit"  :unsigned-long)  ;; :unsigned long
 (defcvar "R_SignalHandlers" :unsigned-long) ;; :unsigned long
 
-(defun r-turn-off-stack-checking ()
-  (setf *R-SIGNALHANDLERS* 0)
+(defun r-turn-off-signal-handling ()
+  (setf *R-SIGNALHANDLERS* 0))
+
+(defun r-turn-off-stack-checking()
   (setf *R-CSTACKLIMIT* 4294967295)
   )
   ;; (setf *R-CSTACKLIMIT* -1))
@@ -121,19 +123,19 @@ need to check."
 
 (defun start-rclg (&optional (argv *r-default-argv*))
   "Initial the first R thread, perhaps with different arguments."  
-  (r-turn-off-stack-checking)
-  (check-stack)
+  (r-turn-off-signal-handling)
   (unless *r-started*
     (progn
       #+sbcl(sb-int:set-floating-point-modes :traps (list :overflow))
       (setf *r-started*
 	    (progn
 	      (with-foreign-string-array (foreign-argv n argv)
-		(%rf-init-embedded-r n foreign-argv))
-	      #+sbcl(start-rclg-update-thread)))))
-  (check-stack)
-  (r-turn-off-stack-checking))
-  
+		(%rf-initialize-r n foreign-argv)
+		(r-turn-off-stack-checking)
+		(%setup-r-main-loop)))))))
+
+;; %#+sbcl(start-rclg-update-thread)))))
+
 ;; FIXME:AJR: Do we really want to force this, or should we wait and
 ;; let the user do this when appropriate?
 

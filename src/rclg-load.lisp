@@ -42,23 +42,23 @@
     ;; "/opt/R-2-3-patches/lib/R" ;; root is /opt/R-2-3-patches/
     ;;  "/opt/rdevel/lib/R"        ;; root is /opt/rdevel/
     ;;  "/usr/lib/R/"             ;; root is /usr/
-    "/home/rif/RCLG-test/R-2.3.1"
-    ))
+    "/home/rif/rclg-test/R-2.3.1")
+  (defvar *R-LIB-PATH* "/home/rif/rclg-test/R-2.3.1/lib"))
 
-; *R-HOME-STR*
 
-(defvar *R-CORE-LIB-DIRS* (list (concatenate 'string *R-HOME-STR* "/lib")
-				(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/")))
+;;(defvar *R-CORE-LIB-DIRS* (list (concatenate 'string *R-HOME-STR* "/lib")
+;;				(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/")))
 
 ; *R-CORE-LIB-DIRS*
 
 (posix-setenv "R_HOME" *R-HOME-STR* 1)
+(posix-setenv "LD_LIBRARY_PATH" (concatenate 'string (posix-getenv "LD_LIBRARY_PATH") *R-LIB-PATH*) 1)
 
 (defun load-r-libraries () 
   (unless *rclg-loaded*
     (progn
       
-      (add-new-cffi-lib-directory *R-CORE-LIB-DIRS*)
+      ;; (add-new-cffi-lib-directory *R-CORE-LIB-DIRS*)
       ;;(posix-getenv "LD_LIBRARY_PATH") ; validation of "right thing"
       
       (defvar libr-location  (concatenate 'string *R-HOME-STR* "/lib/" "libR"))
@@ -72,11 +72,11 @@
       ;;(define-foreign-library libR (t (:default "libR")))
       (use-foreign-library libR)
       
-      (define-foreign-library grDevices (t (:default #.(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/grDevices"))))
+      ;; (define-foreign-library grDevices (t (:default #.(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/grDevices"))))
       ;;(define-foreign-library grDevices (t (:default "grDevices")))
 
       ;; the following complains that it can't load libR, though we've already loaded it.  Sigh...
-      #+nil(use-foreign-library grDevices)
+      ;; #+nil(use-foreign-library grDevices)
       
       (setf *rclg-loaded* t))))
 
