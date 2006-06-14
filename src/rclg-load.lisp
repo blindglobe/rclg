@@ -7,14 +7,8 @@
 ;;; Intent: initialize environment stuff.  Purely developer level, no
 ;;; user tools.
 
-;(asdf:oos 'asdf:load-op 'cffi)
-;(asdf:oos 'asdf:load-op 'rclg)
-;(load "rclg-cffi-sysenv")
-;(use-package :cffi)
-;(use-package :rclg-cffi-sysenv)
-
 (defpackage :rclg-load
-  (:use :common-lisp :cffi :rclg-cffi-sysenv);  :osicat)
+  (:use :common-lisp :cffi :rclg-cffi-sysenv)
   (:export load-r-libraries *rclg-loaded*))
 
 (in-package :rclg-load)
@@ -24,62 +18,18 @@
 (defvar *rclg-loaded* nil
   "True once rclg is loaded, nil otherwise (including errors).")
 
-;; The next one is important so that we do the right thing for any
-;; helper acceleration libraries (which was originally what rif
-;; wanted.  The other is more to "do the right thing", at least
-;; eventually.
-;; (setf (logical-pathname-translations "rclgsrc")
-;;       '(("**;*.*.*"
-;; 	 "/home/rossini/public_html/CLS/CommonLispStat/CLS1.0A1.lisp/LispPackages/RCLG.svn/**/")))
-;; ;; FIXME:AJR: Need to verify this incantation
-;; (setf (logical-pathname-translations "rhomedir")
-;;       '(("**;*.*.*"
-;; 	 "/opt/R-2-3-patches/lib/R/lib/**/")))
-
+;; The user MUST make sure *R-HOME-STR* points to the right place!  --rif
 (eval-when (:compile-toplevel :load-toplevel)
-  (defvar *R-HOME-STR* 
-    ;;  "/opt/R-2-2-patches/lib/R" ;; root is /opt/R-2-2-patches/
-    ;; "/opt/R-2-3-patches/lib/R" ;; root is /opt/R-2-3-patches/
-    ;;  "/opt/rdevel/lib/R"        ;; root is /opt/rdevel/
-    ;;  "/usr/lib/R/"             ;; root is /usr/
-    "/home/rif/rclg-test/R-2.3.1")
-  (defvar *R-LIB-PATH* "/home/rif/rclg-test/R-2.3.1/lib"))
-
-
-;;(defvar *R-CORE-LIB-DIRS* (list (concatenate 'string *R-HOME-STR* "/lib")
-;;				(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/")))
-
-; *R-CORE-LIB-DIRS*
+  (defvar *R-HOME-STR* "/home/rif/rclg-test/R-2.3.1"))
 
 (posix-setenv "R_HOME" *R-HOME-STR* 1)
-(posix-setenv "LD_LIBRARY_PATH" (concatenate 'string (posix-getenv "LD_LIBRARY_PATH") *R-LIB-PATH*) 1)
 
 (defun load-r-libraries () 
   (unless *rclg-loaded*
     (progn
-      
-      ;; (add-new-cffi-lib-directory *R-CORE-LIB-DIRS*)
-      ;;(posix-getenv "LD_LIBRARY_PATH") ; validation of "right thing"
-      
-      (defvar libr-location  (concatenate 'string *R-HOME-STR* "/lib/" "libR"))
-      ;libr-location
-      ;(stringp libr-location)
-
-      ;; I don't understand why I have to use explicit strings and paths?
-      ;; TODO:  Figure out a way to get rid of explicit strings here (rif)
-      ;; DOES THIS #. work?  (rif)
       (define-foreign-library libR (t (:default #.(concatenate 'string *R-HOME-STR* "/lib/libR"))))
-      ;;(define-foreign-library libR (t (:default "libR")))
       (use-foreign-library libR)
-      
-      ;; (define-foreign-library grDevices (t (:default #.(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/grDevices"))))
-      ;;(define-foreign-library grDevices (t (:default "grDevices")))
-
-      ;; the following complains that it can't load libR, though we've already loaded it.  Sigh...
-      ;; #+nil(use-foreign-library grDevices)
-      
       (setf *rclg-loaded* t))))
 
-  
-  ;; *rclg-loaded*
+;; *rclg-loaded*
   
