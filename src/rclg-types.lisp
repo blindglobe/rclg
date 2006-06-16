@@ -91,9 +91,9 @@ MAY NOT BE PORTABLE."
    (protected :initarg :protected :initform nil)))
 
 (defmethod print-object ((s sexp-holder) stream)
-  (format stream "#<sexp at 0x~16R, ~A>" 
+  (format stream "#<sexp at 0x~16R, PROTECT=~A>" 
 	  (pointer-address (slot-value s 'sexp))
-	  (if (slot-value s 'protected) 'protected 'unprotected)))
+	  (slot-value s 'protected)))
 
 (defctype r-string :pointer)
 (def-typed-struct r-complex :double rl im)
