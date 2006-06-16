@@ -57,6 +57,8 @@ Assumes it's a complex robj."
 Assumes it's a string robj."
   (foreign-string-to-lisp (%r-char (%string-elt robj i))))
 
+
+;;; FIXME:AJR:  NA value?
 (defgeneric convert-to-r (value)
   (:method ((n null)) *r-nil-value*)
   (:method ((i integer)) (int-to-robj i))
@@ -224,6 +226,7 @@ should be let user beware (i.e. assume 'intelligence')."
   (case type
     (#.(sexp-elt-type :intsxp) 'integer); Sigh, not fixnum.
 					; FIXME:AJR: Why not? Range?
+					; AJR: I think speed
     (#.(sexp-elt-type :lglsxp) 'boolean)
     (#.(sexp-elt-type :realsxp) 'double-float)
     (#.(sexp-elt-type :cplxsxp) 'complex)
@@ -261,3 +264,12 @@ SEXP.  Used to verify values."
 SEXP." 
   (= (pointer-address robj)
      (pointer-address *r-nil-value*)))
+
+
+;;; Need to write
+#+nil
+(defun r-na (robj)
+  "Checks if R SEXP is missing value."
+  (= (pointer-address robj)
+     (pointer-address *r-missing-value*)))
+
