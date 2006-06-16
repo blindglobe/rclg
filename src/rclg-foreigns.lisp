@@ -162,6 +162,8 @@
 (def-r-var "R_NilValue" *r-nil-value*)
 (def-r-var "R_InputHandlers" *r-input-handlers*)
 
+
+
 ;;; data to R conversion functions -- found in ../c/rclg-helpers.c
 ;; will only work if shared libraries are loaded.
 
@@ -171,9 +173,54 @@
   (i :int)
   (s sexp))
 
+
+
+#+nil
+(defun %double-float-vec-to-R (lisp-float-vector length sexp)
+  (dotimes (i length) 
+      (let* ((tmp (%rf-alloc-vector %REALSXP length))
+	     (tmpptr (%REAL tmp))
+	     (tmpval (aref lisp-float-vector i))
+	(setf tmpptr tmp-float)
+	(%set-vector-elt lisp-double-vector i tmp)
+	(setf i (+ i 1))))))
+
+      
+#|
+void doubleFloatVecToR(double *d, int length, SEXP v) {
+  int i;
+
+  for (i = 0; i < length; i++) {
+    SEXP tmp = Rf_allocVector(REALSXP, 1);
+    double *tmpptr = REAL(tmp);
+    *tmpptr = d[i];
+    SET_VECTOR_ELT(v, i, tmp);
+  }
+}
+
+|#
+
+
+
 #+nil
 (defcfun ("intVecToR" %integer-vec-to-R) :void
   (d :pointer)
   (i :int)
   (s sexp)
   (div :int))
+
+#|
+/* We use the divisor to handle the fact that CMUCL fixnums are *4. */
+/* May not work in other CLs. */
+void intVecToR(int *d, int length, SEXP v, int divisor) {
+  int i;
+
+  for (i = 0; i < length; i++) {
+    SEXP tmp = Rf_allocVector(INTSXP, 1);
+    int *tmpptr = INTEGER(tmp);
+    *tmpptr = d[i]/divisor;
+    SET_VECTOR_ELT(v, i, tmp);
+  }
+}
+|#
+
