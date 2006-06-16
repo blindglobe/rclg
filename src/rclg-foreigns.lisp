@@ -72,7 +72,7 @@
 
 ;; FIXME:AJR: def-function doesn't take a docstring!  
 ;; The following "'Protects' the item (presumably by telling the
-;; garbage collector it's in use, although I(rif) haven't looked at
+;; garbage collector it's in use, although I (rif) haven't looked at
 ;; the internals.  Returns the same pointer you give it.)"
 (defcfun ("Rf_protect" %rf-protect) sexp
   (s sexp))
@@ -223,4 +223,3 @@ void intVecToR(int *d, int length, SEXP v, int divisor) {
   }
 }
 |#
-

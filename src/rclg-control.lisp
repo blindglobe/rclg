@@ -9,7 +9,7 @@
 (defpackage :rclg-control
   (:use :common-lisp :cffi :rclg-types :rclg-foreigns :rclg-access
 	:rclg-init :rclg-convert :rclg-util)
-  (:export r rnb))
+  (:export :r :rnb :rnbi))
 
 (in-package :rclg-control)
 
@@ -57,7 +57,7 @@ Returns an unprotected, unconverted R object."
 
 (defun get-r-error ()
   ;;FIXME:AJR:  what does geterrmessage reference to?
-  (r geterrmessage)
+  (r-call "geterrmessage")
   #+nil(princ "get-r-error: not implemented"))
 
 (defun r-eval (expr)
@@ -80,7 +80,11 @@ Returns an unprotected, unconverted R object."
 	    (parse-keyword exp cur (cadr arglist))
 	    (setf arglist (cdr arglist)))
 	(parse-regular-arg exp cur))
-      (setf exp (r-cdr exp)))))
+      (setf exp (r-cdr exp))
+      (when (and (typep cur 'sexp-holder)
+		 (eq (slot-value cur 'protected) 'r-protect-until-used))
+	(%rf-unprotect-ptr (slot-value cur 'sexp))
+	(setf (slot-value cur 'protected) nil)))))
 
 (defun parse-keyword (exp kwd arg)
   (r-setcar exp (convert-to-r arg))
@@ -128,5 +132,19 @@ be a symbol or string.  VERIFY:AJR: args are function arguments."
 		  ,names))))))
 
 (defmacro rnb (name &rest args)
-  "Calls R, but returns the unevaled R object.  Doesn't protect it."
-  `(make-instance 'sexp-holder :sexp (r-call (get-name ,name) ,@args)))
+  "Calls R, but returns the unevaled R object.  Protects it."
+  `(make-instance 'sexp-holder
+    :sexp (%rf-protect (r-call (get-name ,name) ,@args))
+    :protected t))
+
+(defmacro rnbi (name &rest args)
+  "Calls R, returns the unevaled R object.  R object is protected, but
+only until it's used in an R call.  Designed to be used internally to
+R calls for 'anonymous' objects."
+  `(make-instance 'sexp-holder
+    :sexp (%rf-protect (r-call (get-name ,name) ,@args))
+    :protected 'r-protect-until-used))
+
+(defun unprotect-sexp (sexp-holder)
+  (%rf-unprotect-ptr (slot-value sexp-holder 'sexp))
+  (setf (slot-value sexp-holder 'protected) nil))

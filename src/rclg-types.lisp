@@ -13,7 +13,7 @@
 	   :listsxp-struct :listsxp
 	   :cdrval :carval
 	   :sxp-int-union :sexprec-internal-union
-	   :r-string :r-complex :rl :im ))
+	   :r-string :r-complex :rl :im :protected :r-protect-until-used))
 
 (in-package :rclg-types)
 

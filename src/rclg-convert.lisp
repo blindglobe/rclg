@@ -12,9 +12,9 @@
 (defpackage :rclg-convert
   (:use :common-lisp :cffi
 	:rclg-util :rclg-types :rclg-foreigns)
-  (:export *r-na*
-	   convert-to-r convert-from-r
-	   r-bound r-nil))
+  (:export :*r-na*
+	   :convert-to-r :convert-from-r
+	   :r-bound :r-nil))
 
 (in-package :rclg-convert)
 
@@ -48,7 +48,7 @@ SEXP? Assumes it's an double-float robj."
 (defun robj-to-complex (robj &optional (i 0))
   "Returns the complex number inside an R object as a CL value.
 Assumes it's a complex robj."
-  (let ((complex (mem-aref (%COMPLEX robj) 'r-complex im)))
+  (let ((complex (mem-aref (%COMPLEX robj) 'r-complex i)))
     (complex (foreign-slot-value complex 'r-complex 'rl)
 	     (foreign-slot-value complex 'r-complex 'im))))
 
@@ -67,7 +67,7 @@ Assumes it's a string robj."
   (:method ((c complex)) (complex-to-robj c))
   (:method ((s string)) (string-to-robj s))
   (:method ((s sequence)) (sequence-to-robj s))
-  (:method ((s sexp-holder)) (slot-value s 'sexp))
+  (:method ((s sexp-holder)) (sexp-to-robj s))
   (:method ((v vector)) (sequence-to-robj v))
   (:method ((a array)) (array-to-robj a))
   (:method ((k symbol)) k)) ;; for keywords or for T
@@ -110,6 +110,9 @@ Coerces both real and imaginary points to double-float."
 	    (foreign-slot-value complex 'r-complex 'im)
 	    (coerce (imagpart c) 'double-float)))
     robj))
+
+(defun sexp-to-robj (s)
+  (slot-value s 'sexp))
 
 (defun string-to-robj (string)
   "Convert a string to an R object.
