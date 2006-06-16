@@ -24,7 +24,8 @@
 (in-package :rclg-init)
 
 ;; initialization
-(defvar *r-default-argv* '("rclg" "-q" "--vanilla" "--max-ppsize=50000")) ; last term to incr stack
+(defvar *r-default-argv*
+  '("rclg" "-q" "--vanilla" "--max-ppsize=50000")) ; last term to incr stack
 (defvar *r-started* nil)
 
 ;; thread management
@@ -77,7 +78,6 @@ generic.  However, it isn't useful until implemented on other CL
 systems." 
   (setf *do-rclg-updates-p* nil))
 	       
-
 (defun string-sequence-to-foreign-string-array (string-sequence)
   "CFFI-based conversion.  Isn't there a new CFFI function for this?
 FIXME:AJR: need to check."
@@ -103,23 +103,25 @@ need to check."
 	     (mem-aref ,name :pointer ,ctr)))
 	  (foreign-free ,name))))))
 
+;; FIXME:AJR what is the point of the equiv comments?  i.e. signed-long?
 (defcvar "R_CStackLimit"  :unsigned-long)  ;; :unsigned long
 (defcvar "R_SignalHandlers" :unsigned-long) ;; :unsigned long
 
+
 (defun r-turn-off-signal-handling ()
+  "Turn of stack checking, based on changes present in 2.3.1 release." 
   (setf *R-SIGNALHANDLERS* 0))
 
-(defun r-turn-off-stack-checking()
-  (setf *R-CSTACKLIMIT* 4294967295)
-  )
+(defun r-turn-off-stack-checking ()
   ;; (setf *R-CSTACKLIMIT* -1))
-
+  ;; This following is a complete hack since CFFI currently doesn't
+  ;; believe the above (it thinks that it's unsigned so upchucks)
+  (setf *R-CSTACKLIMIT* 4294967295))
 
 (defun check-stack ()
   (format t "STACK: LIMIT ~A, HANDLERS ~A~%" 
 	  *R-CSTACKLIMIT* *R-SIGNALHANDLERS*)
   (force-output t))
-
 
 (defun start-rclg (&optional (argv *r-default-argv*))
   "Initial the first R thread, perhaps with different arguments."  
@@ -141,5 +143,3 @@ need to check."
 
 ;;(eval-when (:load-toplevel)
 ;;  (start-rclg))
-
-
