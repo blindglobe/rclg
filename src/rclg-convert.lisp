@@ -48,9 +48,9 @@ SEXP? Assumes it's an double-float robj."
 (defun robj-to-complex (robj &optional (i 0))
   "Returns the complex number inside an R object as a CL value.
 Assumes it's a complex robj."
-  (let ((complex (mem-aref (%COMPLEX robj) 'r-complex i)))
-    (complex (foreign-slot-value complex 'r-complex 'r)
-	     (foreign-slot-value complex 'r-complex 'i))))
+  (let ((complex (mem-aref (%COMPLEX robj) 'r-complex im)))
+    (complex (foreign-slot-value complex 'r-complex 'rl)
+	     (foreign-slot-value complex 'r-complex 'im))))
 
 (defun robj-to-string (robj &optional (i 0))
   "Convert an R object to a CL string.
@@ -105,9 +105,9 @@ precision."
 Coerces both real and imaginary points to double-float." 
   (let ((robj (%rf-alloc-vector #.(sexp-elt-type :cplxsxp) 1)))
     (let ((complex (mem-ref (%COMPLEX robj) 'r-complex)))
-      (setf (foreign-slot-value complex 'r-complex 'r) 
+      (setf (foreign-slot-value complex 'r-complex 'rl) 
 	    (coerce (realpart c) 'double-float)
-	    (foreign-slot-value complex 'r-complex 'i)
+	    (foreign-slot-value complex 'r-complex 'im)
 	    (coerce (imagpart c) 'double-float)))
     robj))
 

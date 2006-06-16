@@ -13,7 +13,7 @@
 	   :listsxp-struct :listsxp
 	   :cdrval :carval
 	   :sxp-int-union :sexprec-internal-union
-	   :r-string :r-complex :r :i ))
+	   :r-string :r-complex :rl :im ))
 
 (in-package :rclg-types)
 
@@ -96,4 +96,4 @@ MAY NOT BE PORTABLE."
 	  (if (slot-value s 'protected) 'protected 'unprotected)))
 
 (defctype r-string :pointer)
-(def-typed-struct r-complex :double r i)
+(def-typed-struct r-complex :double rl im)
