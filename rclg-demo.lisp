@@ -56,20 +56,23 @@
 
 (r "ls")
 
-(r "assign" "x" 5)
-(r "assign" "z" "y")
+(r assign "x" 5)
+(r assign "z" "y")
+
 (r "get" "x")
 (r "get" "z")
+(r get "z")
 (r "ls")
 
 ;;; Not quite yet; we need vectors and dataframe conversion
 (r "assign" "my.x" (r "rnorm" 10))
-(r "get" "my.x")
+(r get "my.x")
 
 (r "plot" #(2 3 3 2 1) #(3 5 7 3 2)) ; works
 
-;;; how do we do named arguments?
-(r "plot" #(2 3 3 2 1) #(3 5 7 3 2) '(type ="l") ) ;
+(r plot (list 1 2 3 4 5) (list 1 2 3 4 5) :main "My title")
+
+(r plot (list (r rnorm 10)) (list (r rnorm 10)) :main "silly")
 
 ;;; how do we terminate the R session?
 (r "q" "y")
