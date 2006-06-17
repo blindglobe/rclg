@@ -55,10 +55,15 @@ Returns an unprotected, unconverted R object."
 	  (prog1 (with-r-traps (r-eval exp))
 	    (%rf-unprotect 1))))))  ;; r-call
 
+(defvar *rclg-last-error* nil)
+
 (defun get-r-error ()
-  ;;FIXME:AJR:  what does geterrmessage reference to?
-  (r-call "geterrmessage")
-  #+nil(princ "get-r-error: not implemented"))
+  "Use R's standard error holding mechanism to return the last error
+that occured.  Should we push the result into a global variable,
+something like *rclg-last-error* which could be originally nil?"
+  ;; (r-call "geterrmessage"))
+  ;; (r "geterrmessage"))
+  (setf *rclg-last-error* (r-call "geterrmessage")))
 
 (defun r-eval (expr)
   "raw R expression evaluation."
@@ -121,7 +126,10 @@ Returns an unprotected, unconverted R object."
 (eval-when (:compile-toplevel :load-toplevel)
   (defmacro r (name &rest args)
     "The primary RCLG interface.  Backconverts the answer.  Name can
-be a symbol or string.  VERIFY:AJR: args are function arguments."  
+be a symbol or string.  Args are ordered or named (:named-arg)
+arguments.  Example:
+  (r plot #(1 3 2) #(3 2 5) :main \"silly plot\") 
+." 
     (with-gensyms (evaled names dims result)
       `(let ((,evaled (r-call (get-name ,name) ,@args)))
 	(let ((,result (convert-from-r ,evaled))
