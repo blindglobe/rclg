@@ -10,7 +10,7 @@
 
 (defpackage :rclg
   (:use :common-lisp
-	:rclg-control :rclg-convert
+	:rclg-control :rclg-convert :rclg-abstractions
 	:rclg-foreigns :rclg-init :rclg-cffi-sysenv
 	:rclg-load :rclg-types :rclg-util)
   (:export :r :rnb :rnbi :rnr
