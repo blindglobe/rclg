@@ -26,23 +26,7 @@
   (defvar *R-HOME-STR* 
     ;;"/home/rif/RCLG-test/R-2.3.1"
     "/home/rif/rclg-test/R-2.3.1"
-    ;;"/usr/lib/R"             ;; root is /usr/
-    ;;"/opt/R-2-2-patches/lib/R" ;; root is /opt/R-2-2-patches/
-    ;;"/opt/R-2-3-patches/lib/R" ;; root is /opt/R-2-3-patches/
-    ;;"/opt/rdevel/lib/R"        ;; root is /opt/rdevel/
     ))
-
-;; (setf *R-HOME-STR*   "/usr/lib/R")
-;; *R-HOME-STR*
-
-(defvar *R-CORE-LIB-DIRS*
-  (list (concatenate 'string *R-HOME-STR* "/lib")
-	(concatenate 'string *R-HOME-STR* "/library/grDevices/libs/")))
-
-;; (setf *R-CORE-LIB-DIRS*
-;;        (list (concatenate 'string *R-HOME-STR* "/lib")
-;;              (concatenate 'string *R-HOME-STR* "/library/grDevices/libs/")))
-;; *R-CORE-LIB-DIRS*
 
 (posix-setenv "R_HOME" *R-HOME-STR* 1)
 

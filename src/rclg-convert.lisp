@@ -14,13 +14,13 @@
 	:rclg-util :rclg-types :rclg-foreigns)
   (:export :*r-na*
 	   :convert-to-r :convert-from-r
-	   :r-bound :r-nil))
+	   :r-bound-p :r-nil-p))
 
 (in-package :rclg-convert)
 
 (eval-when (:compile-toplevel :load-toplevel)
-  (defvar *r-NA-internal* -2147483648) ;;  PLATFORM SPECIFIC HACK!!!
-  ;; FIXME:AJR:  rif -- for which platform?!
+  ;;  PLATFORM SPECIFIC HACK FOR 32-BIT MACHINES (e.g. Pentium Linux)
+  (defvar *r-NA-internal* -2147483648) 
   (defvar *r-na* 'r-na))
 
 ;;; Basic Conversion Routines.  None of them support error checking on
@@ -215,15 +215,13 @@ does."
   "Attempt to convert a general R value to a CL value.
 FIXME:AJR: what should happen upon failure?  Do we even care, or
 should be let user beware (i.e. assume 'intelligence')."
-  (if (r-nil robj)
-      nil
+  (unless (r-nil-p robj)
     (let ((length (%rf-length robj)))
-      (if (= length 0) 
-	  nil
+      (unless (= length 0) 
 	(let ((result (convert-from-r-seq robj length)))
 	  (if (= length 1) 
 	      (aref result 0)
-	    result))))))
+	      result))))))
 
 (defun sexptype-to-element-type (type)
   (case type
@@ -256,13 +254,13 @@ should be let user beware (i.e. assume 'intelligence')."
 	      (t (error "Unknown type")))))
     (values result type)))
 
-(defun r-bound (robj)
+(defun r-bound-p (robj)
   "Checks if an R SEXP is (has the address of) the *r-unbound-value*
 SEXP.  Used to verify values."
   (not (= (pointer-address robj) 
 	  (pointer-address *r-unbound-value*))))
 
-(defun r-nil (robj)
+(defun r-nil-p (robj)
   "Checks if an R SEXP is (has the address of) the *r-nil-value*
 SEXP." 
   (= (pointer-address robj)

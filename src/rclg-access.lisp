@@ -10,7 +10,7 @@
 
 (defpackage :rclg-access
   (:use :common-lisp :cffi :rclg-types)
-  (:export r-setcar r-car r-cdr))
+  (:export :r-setcar :r-car :r-cdr))
 
 (in-package :rclg-access)
 

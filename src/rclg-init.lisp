@@ -17,9 +17,9 @@
 
 (defpackage :rclg-init
   (:use :common-lisp :rclg-foreigns :cffi)
-  (:export start-rclg update-R 
-	   start-rclg-update-thread stop-rclg-update-thread 
-	   with-R-traps with-r-mutex))
+  (:export :start-rclg :update-R :*r-started*
+	   :start-rclg-update-thread :stop-rclg-update-thread 
+	   :with-R-traps :with-r-mutex))
 
 (in-package :rclg-init)
 

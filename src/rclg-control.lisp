@@ -9,7 +9,7 @@
 (defpackage :rclg-control
   (:use :common-lisp :cffi :rclg-types :rclg-foreigns :rclg-access
 	:rclg-init :rclg-convert :rclg-util)
-  (:export :r :rnb :rnbi))
+  (:export :r :rnb :rnbi :rnr))
 
 (in-package :rclg-control)
 
@@ -21,9 +21,8 @@ that points to it, otherwise returns NIL."
   (with-foreign-string (ident-foreign name)
     (let ((foreign-value
 	   (%rf-find-var (%rf-install ident-foreign) *r-global-env*)))
-      (if (r-bound foreign-value)
-	  foreign-value
-	  nil))))
+      (when(r-bound-p foreign-value)
+	foreign-value))))
 
 (defun rname-to-rfun (name)
   "If R has a mapping for name (name is a string), returns the SEXP
@@ -32,9 +31,8 @@ that points to it, otherwise returns NIL."
        (with-foreign-string (ident-foreign name)
 	 (let ((foreign-value
 		(%rf-find-fun (%rf-install ident-foreign) *r-global-env*)))
-	   (if (r-bound foreign-value)
-	       foreign-value
-	       nil)))))
+	   (when (r-bound-p foreign-value)
+	     foreign-value)))))
 
 (defun sexp-length (args)
   (+ 1 (length args) (- (count-keywords args))))
@@ -113,12 +111,12 @@ something like *rclg-last-error* which could be originally nil?"
 
 (defun r-names (robj)  
   (let ((names (%rf-get-attrib robj *r-names-symbol*)))
-    (unless (r-nil names)
+    (unless (r-nil-p names)
       (convert-from-r names))))
 
 (defun r-dims (robj)
   (let ((dims (%rf-get-attrib robj *r-dims-symbol*)))
-    (unless (r-nil dims)
+    (unless (r-nil-p dims)
       (convert-from-r dims))))
 
 ;;; External 
@@ -152,6 +150,13 @@ R calls for 'anonymous' objects."
   `(make-instance 'sexp-holder
     :sexp (%rf-protect (r-call (get-name ,name) ,@args))
     :protected 'r-protect-until-used))
+
+(defmacro rnr (name &rest args)
+  "Calls R, but throws away the result and returns nothing.  Useful
+for side effects such as plotting."
+  `(progn
+    (r-call (get-name ,name) ,@args)
+    nil))
 
 (defun unprotect-sexp (sexp-holder)
   (%rf-unprotect-ptr (slot-value sexp-holder 'sexp))

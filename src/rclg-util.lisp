@@ -10,9 +10,9 @@
 
 (defpackage :rclg-util
   (:use :common-lisp)
-  (:export with-gensyms  ;; for macro
-	   over-column-major-indices ;; prime export
-	   to-list to-vector)) ;; for macro.  But need to export?
+  (:export :with-gensyms  
+	   :over-column-major-indices 
+	   :to-list :to-vector)) 
 
 (in-package :rclg-util)
 

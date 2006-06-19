@@ -11,9 +11,9 @@
 
 (defpackage :rclg-cffi-sysenv
   (:use :common-lisp :cffi)
-  (:export posix-setenv posix-getenv
-	   add-new-cffi-lib-directory
-	   posix-setrlimit posix-getrlimit))
+  (:export :posix-setenv :posix-getenv
+	   :add-new-cffi-lib-directory
+	   :posix-setrlimit :posix-getrlimit))
 
 (in-package :rclg-cffi-sysenv)
 
