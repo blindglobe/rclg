@@ -41,7 +41,7 @@ specification of default values, others keys are allowed.  For example,
 creates a CL function r-hist that calls the R function hist on a
 sequence, returning no results.  The keywords :main and :xlab are
 passed with default values nil, and the other keywords are passed with
-the chosen values.  (Try (r-hist (rnb rnorm 1000)), for instance.)
+the chosen values.  (Try (r-hist (rnbi rnorm 1000)), for instance.)
 "
   (let* ((keyword-names (mapcar #'atom-or-first keyword-args))
 	 (keywords (mapcar #'to-keyword keyword-names))
