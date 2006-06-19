@@ -24,8 +24,7 @@
 	   :%rf-mkchar :%set-string-elt
 	   :%string-elt :%r-char :%r-check-activity :%r-run-handlers
 	   :*r-names-symbol* :*r-dims-symbol* :*r-global-env*
-	   :*r-unbound-value* :*r-nil-value* :*r-input-handlers*
-	   :%double-float-vec-to-R :%integer-vec-to-R))
+	   :*r-unbound-value* :*r-nil-value* :*r-input-handlers*))
 
 (in-package :rclg-foreigns)
 

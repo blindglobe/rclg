@@ -175,31 +175,14 @@ does."
     (let ((robj (%rf-protect (%rf-alloc-vector #.(sexp-elt-type :vecsxp) len)))
 	  (state (type-to-int (elt seq 0)))
 	  (i 0))
-      (typecase seq 
-	((simple-array double-float)
-	 (%double-float-vec-to-R
-	  #+sbcl(sb-sys:vector-sap seq) ;; Need CLISP/CMUCL replacements!
-	  #+cmu nil   ;; FIXME:AJR
-	  #+clisp nil ;; FIXME:AJR
-	  len robj))
-;; 	 (map nil
-;; 	      (lambda (e)
-;; 		(%set-vector-elt robj i (double-float-to-robj e))
-;; 		(incf i))
-;; 	      seq))
-	((simple-array fixnum)
-	 (%integer-vec-to-R
-	  #+sbcl(sb-sys:vector-sap seq)
-	  #+cmu nil ;; FIXME:AJR
-	  #+clisp nil ;; FIXME:AJR
-	  len robj 4))
-	(t 
-	 (map nil
-	      (lambda (e)
-		(%set-vector-elt robj i (convert-to-r e))
-		(setf state (aref +seq-fsm+ state (type-to-int e))
-		      i     (+ i 1)))
-	      seq)))
+      ;; We may reinclude more efficient handling of certain
+      ;; vectors for certain implementations here at some late time
+      (map nil
+	   (lambda (e)
+	     (%set-vector-elt robj i (convert-to-r e))
+	     (setf state (aref +seq-fsm+ state (type-to-int e))
+		   i     (+ i 1)))
+	   seq)
       (let ((result
 	     (case state
 	       (#.+int-seq+ (%rf-coerce-vector robj #.(sexp-elt-type :intsxp)))

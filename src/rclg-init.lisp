@@ -134,9 +134,8 @@ need to check."
 	      (with-foreign-string-array (foreign-argv n argv)
 		(%rf-initialize-r n foreign-argv)
 		(r-turn-off-stack-checking)
-		(%setup-r-main-loop)))))))
-
-;; %#+sbcl(start-rclg-update-thread)))))
+		(%setup-r-main-loop)
+		#+sbcl(start-rclg-update-thread)))))))
 
 ;; FIXME:AJR: Do we really want to force this, or should we wait and
 ;; let the user do this when appropriate?
