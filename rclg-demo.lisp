@@ -16,8 +16,6 @@
 
 (in-package :rclg-user)
 
-;; (symbol-package 'start-r)
-;; *package*
 ;; rclg-init::*r-started*
 
 ;;;#3 Start R within Lisp
@@ -46,9 +44,11 @@
 ;; rnb --- R no backconvert.  Calls R, and returns a protected unconverted R sexp.  Useful when you want to
 ;;         manipulate something on the R side and give it a CL name
 ;; 
-;; rnbi --- R no backconvert internal.  Calls R, returns a protected uncoverted R sexp.  However, it's
-;;          tagged differently, and as soon as you use this as an argument to a function, it unprotects
-;;          the sexp.  Useful for holding anonymous intermediate R results you don't want to backconvert.
+;; rnbi --- R no backconvert internal.  Calls R, returns a protected
+;;          uncoverted R sexp.  However, it's tagged differently, and
+;;          as soon as you use this as an argument to a function, it
+;;          unprotects the sexp.  Useful for holding anonymous
+;;          intermediate R results you don't want to backconvert.
 ;; 
 ;; Protection/unprotection controls whether R can GC the sexp.
 ;; 
@@ -99,7 +99,7 @@
 (r "Sys.getenv" "LD_PRELOAD")
 
 (r "ls")
-(r "search") ;; works
+(r "search")
 
 (r "geterrmessage")
 
@@ -136,16 +136,17 @@ my.lib
 (r "ls")
 
 
-(r assign "my.x" (r rnorm 10)) ;; fails only because we don't have the
-;; translation tools working.
-(r assign "my.x" (rnb rnorm 10)) ;; works at this point.
+(r assign "my.x" (r rnorm 10))
+(r assign "my.x" (rnb rnorm 10))
 
 (r get "my.x")
 
 
+
+
 ;; More sophisticated computation
 
-(r "plot" #(2 3 3 2 1) #(3 5 7 3 2)) ; works
+(r "plot" #(2 3 3 2 1) #(3 5 7 3 2))
 
 (r plot (list 1 2 3 4 5) (list 1 2 3 4 5) :main "My title")
 (r plot :x (list 1 2 3 4 5) :y (list 5 4 3 4 5) :main "My title")
@@ -155,61 +156,71 @@ my.lib
 (r plot (rnb rnorm 10) (rnb rnorm 10)
    :main "silly" :xlab "xlabel" :ylab "ylabel")
 
+(aref (r rnorm 10) 3)
+
+
+;; create a CL function r-hist that calls the R function hist on a
+;; sequence, returning no results.  The keywords :main and :xlab are
+;; passed with default values nil, and the other keywords are passed with
+;; the chosen values.
+(def-r-call (r-hist hist :no-result sequence) main
+  xlab (breaks 50) (probability t) (col "blue"))
+;; then the function can be called:
+(r-hist (rnbi rnorm 1000))
+;; for instance.
+
+
+;;;#5 Code (really, applications/tasks) that needs to work (i.e. be
+;;;   do-able).
+
+
 ;;; Need to be able to run!
 (r assign "my.df" (r read.table "testdata.csv"))
 (r summary "my.df")
 
+
+
+;;; Model fitting?
+
+(rnb as.formula "x ~ y") ; fine
+(rnbi as.formula "x ~ y") ; fine
+(r as.formula "x ~ y") ; barfs
+
+(rnb data.frame
+     :x (r rnorm 10)
+     :y (r rnorm 10)) ; fine
+(r data.frame
+   :x (r rnorm 10)
+   :y (r rnorm 10)) ; fine
+
+(r summary (r t (r data.frame
+		   :x (r rnorm 10)
+		   :y (r rnorm 10)))) ; fine ; fine ; no.
+
+(r lm
+   :formula (rnb as.formula "x ~ y")
+   :data (rnb data.frame
+	    :x (r rnorm 10)
+	    :y (r rnorm 10)))
+
+
 ;;; How to handle connections?
+
 
 ;;; How to handle S4 objects?
 ;;; Hook into the conversion?
 
+
 ;;; how do we terminate the R session?
 (r "q" "y")
 
-(aref (r rnorm 10) 3)
+
+
+
+
 
 ;;;#5 Old useless code.
 
-#+nil
-(progn
-  (rclg-control::rname-to-robj "rnorm")
-  ;;NIL if we have library problems
-  (rclg-control::rname-to-robj "print")
-  ;;#.(SB-SYS:INT-SAP #X082F3FF8)
-  (rclg-control::rname-to-robj "c")
-  ;;#.(SB-SYS:INT-SAP #X08191A44)
-  (rclg-control::rname-to-robj "print.default")
-  ;;#.(SB-SYS:INT-SAP #X082FAA04)
-  (rclg-control::rname-to-robj "+")
-  ;;#.(SB-SYS:INT-SAP #X0818FD78)
-  (rclg-control::rname-to-robj "[")
-  ;;#.(SB-SYS:INT-SAP #X08190360)
-
-  ;; Note that the first checks if we've got an object, and the second
-  ;; checks to see if we have a function.  R doesn't think they are the
-  ;; same (not unlike CL).
-  (rclg-control::rname-to-robj "runif")
-  (rclg-control::rname-to-rfun "runif")
-  (rclg-control::rname-to-rfun "search"))
-
-#|
-On 6/16/06, rif <rif@mit.edu> wrote:
-> 
-> OK, I took a stab at the conversion business, and just checked in my attempt.
-> 
-
-
--- 
-best,
--tony
-
-blindglobe@gmail.com
-Muttenz, Switzerland.
-"Commit early,commit often, and commit in a repository from which we can easily
-roll-back your mistakes" (AJR, 4Jan05).
-
-|#
 
 
 ;;; Local variables:
