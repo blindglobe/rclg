@@ -35,10 +35,12 @@
 	      :depends-on ("rclg-convert"
 			   "rclg-foreigns"
 			   "rclg-init"))
-;;       (:file "rclg-rcall"
-;;	      :depends-on ("rclg-convert" "rclg-control"))
+       (:file "rclg-abstractions"
+	      :depends-on ("rclg-util"
+			   "rclg-control"))
        (:file "rclg" 
-	      :depends-on ("rclg-access"
+	      :depends-on ("rclg-abstractions"
+			   "rclg-access"
 			   "rclg-convert"
 			   "rclg-control"
 			   "rclg-foreigns"
