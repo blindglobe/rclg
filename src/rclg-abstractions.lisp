@@ -13,6 +13,8 @@
 
 (in-package :rclg-abstractions)
 
+;;; Internal functions
+
 (defun remove-keys-from-plist (plist keys)
   "Returns a copy of plist with keys removed.  For re-using the &REST arg after
 removing some options."
@@ -25,6 +27,8 @@ removing some options."
 
 (defun atom-or-first (val)
   (if (atom val) val (car val)))
+
+;;; External functions
 
 (defmacro def-r-call ((function-name r-name conversion &rest required-args) 
 		      &rest keyword-args)
