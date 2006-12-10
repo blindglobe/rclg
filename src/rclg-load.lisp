@@ -18,15 +18,19 @@
 (defvar *rclg-loaded* nil
   "True once rclg is loaded, nil otherwise (including errors).")
 
-;; The user MUST make sure *R-HOME-STR* points to the right place!  --rif
-;; Need to fix this by flagging RIF or TONY or someone else.
 
-;;; This should be fixed.
+;; The user MUST make sure *R-HOME-STR* points to the right place!
+;; --rif 
+
+;; AJR: we do this by testing directories existence.  Rif's is first,
+;; Debian's is second.  A better way to do this would be to check that
+;; the library exists, but we could do that later if we don't need 
+
 (eval-when (:compile-toplevel :load-toplevel)
   (defvar *R-HOME-STR* 
-    ;;"/home/rif/RCLG-test/R-2.3.1"
-    "/home/rif/rclg-test/R-2.3.1"
-    ))
+    (cond
+     ((probe-file #p"/home/rif/rclg-test/R-2.3.1"))
+     ((probe-file #p"/usr/lib/R")))))
 
 (posix-setenv "R_HOME" *R-HOME-STR* 1)
 
