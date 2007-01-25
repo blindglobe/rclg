@@ -28,9 +28,11 @@
 
 (eval-when (:compile-toplevel :load-toplevel)
   (defvar *R-HOME-STR* 
-    (cond
-     ((probe-file #p"/home/rif/rclg-test/R-2.3.1"))
-     ((probe-file #p"/usr/lib/R")))))
+    (namestring
+     (cond
+       ((probe-file #p"/home/rif/RCLG-test/R-2.3.1"))
+       ((probe-file #p"/usr/lib/R"))
+       (t (error "R not found."))))))
 
 (posix-setenv "R_HOME" *R-HOME-STR* 1)
 

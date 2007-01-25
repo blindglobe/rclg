@@ -125,7 +125,8 @@ something like *rclg-last-error* which could be originally nil?"
   (defmacro r (name &rest args)
     "The primary RCLG interface.  Backconverts the answer.  Name can
 be a symbol or string.  Args are ordered or named (:named-arg)
-arguments.  Example:
+arguments.  Examples:
+  (r rnorm 100)
   (r plot #(1 3 2) #(3 2 5) :main \"silly plot\") 
 ." 
     (with-gensyms (evaled names dims result)
