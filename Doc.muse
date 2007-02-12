@@ -55,3 +55,6 @@ embedding R within CommonLisp
 ** CL tools (some R, some general)
 
 1. rclg-utils : with-gensyms, over-column-major-indices, to-list, to-vector
+
+
+*  General approach to merging
