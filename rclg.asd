@@ -3,17 +3,16 @@
 ;;; FIXME:AJR: if needed.
 ;; (asdf:operate 'asdf:load-op 'cffi)
 
-;; RIF: Removed :cffi from :use'd packages here
 (defpackage rclg-system
-  (:use :common-lisp :asdf)) ; :osicat))
+  (:use :common-lisp :asdf))
 
 (in-package :rclg-system)
 
 (defsystem :rclg
   :description "RCLG: R to CL gateway"
-  :version "0.1.0"
+  :version "1"
     :author "rif@mit.edu, blindglobe@gmail.com"
-    :depends-on (:cffi) ; :osicat)
+    :depends-on (:cffi) 
     :components
     ((:module src
       :serial t
