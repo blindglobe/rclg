@@ -5,6 +5,10 @@ available and we aren't forcing the use of Emacs/muse.   M-x muse-mode
 makes reading easier IMHO).
 
 
+* License 
+
+See the file COPYING in the top level directory.
+
 * Interfacing Common Lisp and R
 
 This library considers multiple approaches for connecting Common Lisp
