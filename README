@@ -24,7 +24,8 @@ porcelain around the plumbing.  This will be commented on later.
 You will need the following libraries available:
 
 1. ASDF   (system definition facility, for loading packages)
-2. CFFI   (Common foreign function interface)
+2. CFFI   (Common foreign function interface: later than CFFI-060526)
+                                                        (May 26 2006)
 3. RCLG   (this library)
 
 
