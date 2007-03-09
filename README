@@ -12,9 +12,11 @@ See the file COPYING in the top level directory.
 * Interfacing Common Lisp and R
 
 This library considers multiple approaches for connecting Common Lisp
-and R, particularly for embedding R within CL.   CLSR also attempts to
+and R, particularly for embedding R within CL.  CLSR also attempts to
 do the reverse.  RCL is a third approach, which provides more
-porcelain around the plumbing.  This will be commented on later.
+porcelain around the plumbing.  RCLG also tries to use R with the
+threaded SBCL capability.  All of this will be commented on later (in
+time, in this file).
 
 
 * Quick start
@@ -29,11 +31,21 @@ You will need the following libraries available:
 3. RCLG   (this library)
 
 
-1. If using SBCL, add rclg.asd to the ASDF systems path.
 
+Once you have these, then the simple way to get started is to:
+
+1. add rclg.asd to the ASDF systems path.
 2. See  rclg-demo.lisp  for getting started.  It has incantations for:
    a. compiling and loading cffi
    b. compiling and loading rclg
+   c. basic R functions
+   d. basic data conversion.
+
+
+
+
+
+
 
 
 
@@ -121,14 +133,14 @@ In R, memory.c contains allocVector.  Looks like it *should* be doable
 to directly pass vectors around (non-portably, of course).
 
 
-4. FILES:
 
-rclg-access.lisp : low-level defuns for data transport between R SEXPs
-                   and CL. 
-rclg-types.lisp : structures and objects for R internal types
-rclg-control.lisp : primary interface to R evaluator
-rclg-load.lisp : initialize environment and load libraries.
-rclg-init.lisp : initialize and maintain the R evaluator process. 
+
+
+
+
+
+
+
 
 
 * Comparison of Implementation and Design of RCLG, CLSR.
@@ -139,7 +151,11 @@ rclg-init.lisp : initialize and maintain the R evaluator process.
                start-rclg-update-thread stop-rclg-update-thread 
 	       with-R-traps with-r-mutex
 
+   initialize and maintain the R evaluator process. 
+
 2. rclg-load : load-r-libraries  (FFI initializer, not FFI <-> CL specifier.
+
+   initialize environment and load libraries.
 
 3. clsr-loader: uffi-load-r-library (package: clsr)
 
@@ -150,10 +166,14 @@ rclg-init.lisp : initialize and maintain the R evaluator process.
 1. rclg-access  : r-setcar, r-car, r-cdr
                   (R SEXP content <-> CL data)
 
+   low-level defuns for data transport between R SEXPs and CL. 
+
 2. rclg-convert : convert-to-r, convert-from-r, *r-na*, r-nil, r-bound
                   (data type and data conversion)
 
 3. rclg-types : SEXP data structure information.  exports types, print method.
+
+   structures and objects for R internal types
 
 4. clsr-rref : High level R SEXP data structures and mappings
 
@@ -163,8 +183,9 @@ rclg-init.lisp : initialize and maintain the R evaluator process.
 
 1. rclg-control : r (internal: rname-to-robj, rname-to-rfun
 
-2. clsr-objects : tracks created R objects  in CL (reference counter).
+   primary interface to R evaluator
 
+2. clsr-objects : tracks created R objects  in CL (reference counter).
 
 
 ** R evaluation
@@ -182,5 +203,3 @@ rclg-init.lisp : initialize and maintain the R evaluator process.
 ** CL tools (some R, some general)
 
 1. rclg-utils : with-gensyms, over-column-major-indices, to-list, to-vector
-
-
