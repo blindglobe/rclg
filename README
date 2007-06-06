@@ -23,6 +23,13 @@ time, in this file).
 
 ** Requirements
 
+Common Lisp Implementation:
+
+A. (WORKS!) SBCL 1.0 and later (known, might work on earlier versions)
+
+B. (Goal, but not working yet):  CLISP is a target, but there are a
+   few configuration issues to resolve.
+
 You will need the following libraries available:
 
 1. ASDF   (system definition facility, for loading packages)
@@ -50,7 +57,10 @@ Once you have these, then the simple way to get started is to:
 
 
 
+
 * Past and possibly present "Issues"
+
+1. Need to get it working ("again") with CLISP.
 
 ** From the file formerly known as NOTES/06032006.rif (date contained)
 

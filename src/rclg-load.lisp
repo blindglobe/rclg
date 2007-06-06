@@ -59,9 +59,14 @@
 (eval-when (:compile-toplevel :load-toplevel)
   (defvar *R-HOME-STR* 
     (namestring
-     (cond
-       ((probe-file #p"/home/rif/RCLG-test/R-2.3.1"))
-       ((probe-file #p"/usr/lib/R"))
+     (cond 
+      ;; this is made confusing -- SBCL is lax and lets us use
+      ;; probe-file, but CLISP is more rigourous and forces an error
+      ;; in such cases.
+      #+sbcl((probe-file #p"/home/rif/RCLG-test/R-2.3.1"))
+      #+sbcl((probe-file #p"/usr/lib/R"))
+      #+clisp((ext:probe-directory #p"/home/rif/RCLG-test/R-2.3.1/"))
+      #+clisp((ext:probe-directory #p"/usr/lib/R/"))
        (t (error "R not found."))))))
 
 (posix-setenv "R_HOME" *R-HOME-STR* 1)
