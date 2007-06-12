@@ -22,6 +22,7 @@ default :
 push:
 	git push -v --all git+ssh://repo.or.cz/srv/git/rclg.git
 
+
 tarball-release:
 	git archive -v --format=tar --prefix=rclg-$(VERS)/ release \
 		gzip >rclg-release.tar.gz
