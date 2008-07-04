@@ -237,9 +237,6 @@ my.r.x2
 (r "q" "y") ;; fails.
 
 
-
-
-
 ;;; Local variables:
 ;;; mode: outline-minor
 ;;; outline-header-prefix: ";;;"
