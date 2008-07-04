@@ -9,6 +9,7 @@
 ;; if needed...?  Shouldn't be, since rclg.asd ought to take care of
 ;; most of the issues that we have.
 (asdf:operate 'asdf:compile-op 'cffi)
+(asdf:operate 'asdf:compile-op 'rclg :force t)
 (asdf:operate 'asdf:compile-op 'rclg)
 
 ;;(asdf:operate 'asdf:load-op 'cffi)
@@ -143,6 +144,7 @@ my.lib
 (r "ls")
 
 (setf my.r.x2 (r get "x2"))  ;; moving data from R to CL
+my.r.x2
 (r assign "x2" my.r.x2)  ;; moving data from CL to R
 
 (r "get" "x")
