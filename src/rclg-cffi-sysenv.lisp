@@ -96,5 +96,6 @@
   (dolist (adir dir)
     (add-new-cffi-lib-directory adir)))
 
-;; need to inlcude a default operation which simply aborts, indicating bad inputs.
+;; need to inlcude a default operation which simply aborts, indicating
+;; bad inputs.
 ;;(add-new-cffi-lib-directory (list #p"/usr" "/usr/local"))
