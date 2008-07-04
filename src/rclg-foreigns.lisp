@@ -182,7 +182,7 @@
 
 (eval-when (:compile-toplevel :load-toplevel)
   (defmacro def-r-var (r-name cl-name)
-    `(defcvar (,r-name ,cl-name) sexp :read-only t)))
+    `(defcvar (,r-name ,cl-name  :read-only t) sexp)))
 
 (def-r-var "R_NamesSymbol" *r-names-symbol*)
 (def-r-var "R_DimSymbol" *r-dims-symbol*)
