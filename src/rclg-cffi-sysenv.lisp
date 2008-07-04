@@ -121,6 +121,9 @@ DESCRIPTION
 
 ;;;* Resource limit manipulation (esp for stack)
 
+#|
+
+;; Not clear that these are used anywhere?
 (defctype rlim_t :int
   "numbers describing range limits")
 
@@ -133,3 +136,4 @@ DESCRIPTION
 
 (defcfun ("setrlimit" posix-setrlimit) :int
   (resource :int) (rlimit rlimitStruct))
+|#
