@@ -191,8 +191,6 @@
 (def-r-var "R_NilValue" *r-nil-value*)
 (def-r-var "R_InputHandlers" *r-input-handlers*)
 
-
-
 ;;; data to R conversion functions -- found in ../c/rclg-helpers.c
 ;; will only work if shared libraries are loaded.
 
