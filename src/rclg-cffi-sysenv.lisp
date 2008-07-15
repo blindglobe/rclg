@@ -97,43 +97,4 @@
     (add-new-cffi-lib-directory adir)))
 
 ;; need to inlcude a default operation which simply aborts, indicating bad inputs.
-
 ;;(add-new-cffi-lib-directory (list #p"/usr" "/usr/local"))
-
-;;;* RESOURCES
-#|
-  #include <sys/time.h>
-  #include <sys/resource.h>
-
-       int getrlimit(int resource, struct rlimit *rlim);
-       int setrlimit(int resource, const struct rlimit *rlim);
-
-DESCRIPTION
-       getrlimit()  and  setrlimit()  get  and  set resource limits respectively.
-       Each resource has an associated soft and hard limit,  as  defined  by  the
-       rlimit structure (the rlim argument to both getrlimit() and setrlimit()):
-
-            struct rlimit {
-                rlim_t rlim_cur;  /* Soft limit */
-                rlim_t rlim_max;  /* Hard limit (ceiling for rlim_cur) */
-            };
-|#
-
-;;;* Resource limit manipulation (esp for stack)
-
-#|
-
-;; Not clear that these are used anywhere?
-(defctype rlim_t :int
-  "numbers describing range limits")
-
-(defcstruct rlimitStruct
-   (rlim_cur rlim_t)  ;; soft limit
-   (rlim_max rlim_t)) ;; hard limit
-
-(defcfun ("getrlimit" posix-getrlimit) :int
-  (resource :int) (rlimit rlimitStruct))
-
-(defcfun ("setrlimit" posix-setrlimit) :int
-  (resource :int) (rlimit rlimitStruct))
-|#
