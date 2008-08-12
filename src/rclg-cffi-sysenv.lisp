@@ -122,8 +122,8 @@ DESCRIPTION
 ;;;* Resource limit manipulation (esp for stack)
 
 (defctype rlim_t :int
-  :documentation "numbers describing range limits")
-  
+  "numbers describing range limits")
+
 (defcstruct rlimitStruct
    (rlim_cur rlim_t)  ;; soft limit
    (rlim_max rlim_t)) ;; hard limit
