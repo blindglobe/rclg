@@ -135,9 +135,12 @@ need to check."
 	  (foreign-free ,name))))))
 
 ;; FIXME:AJR what is the point of the equiv comments?  i.e. signed-long?
-(defcvar "R_CStackLimit"  :unsigned-long)  ;; :unsigned long
-(defcvar "R_SignalHandlers" :unsigned-long) ;; :unsigned long
-
+(defcvar "R_CStackLimit"
+    #-:x86-64 :unsigned-long
+    #+:x86-64 :unsigned-long-long)
+(defcvar "R_SignalHandlers"
+    #-:x86-64 :unsigned-long
+    #+:x86-64 :unsigned-long-long)
 
 (defun r-turn-off-signal-handling ()
   "Turn of stack checking, based on changes present in 2.3.1 release." 
@@ -147,7 +150,9 @@ need to check."
   ;; (setf *R-CSTACKLIMIT* -1))
   ;; This following is a complete hack since CFFI currently doesn't
   ;; believe the above (it thinks that it's unsigned so upchucks)
-  (setf *R-CSTACKLIMIT* 4294967295))
+  (setf *R-CSTACKLIMIT*
+        #-:x86-64 #.(- (expt 2 32) 1)
+        #+:x86-64 #.(- (expt 2 64) 1)))
 
 (defun check-stack ()
   (format t "STACK: LIMIT ~A, HANDLERS ~A~%" 
