@@ -19,11 +19,14 @@
 
 (in-package :rclg-user)
 
-;; rclg-init::*r-started*
+;; Have we started yet?
+rclg-init::*r-started*
 
 ;;;#3 Start R within Lisp
 
 (start-rclg)
+
+;; but if it fails, it could be related to...
 
 
 ;; and now we make sure it's working
