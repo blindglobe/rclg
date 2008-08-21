@@ -80,3 +80,4 @@
       (setf *rclg-loaded* t))))
 
 ;; *rclg-loaded*
+;; (load-r-libraries)
