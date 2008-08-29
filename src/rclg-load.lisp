@@ -48,7 +48,6 @@
 (defvar *rclg-loaded* nil
   "True once rclg is loaded, nil otherwise (including errors).")
 
-
 ;; The user MUST make sure *R-HOME-STR* points to the right place!
 ;; --rif 
 
@@ -70,6 +69,9 @@
        (t (error "R not found."))))))
 
 (posix-setenv "R_HOME" *R-HOME-STR* 1)
+
+
+;;(setf *rclg-loaded* nil)
 
 (defun load-r-libraries () 
   (unless *rclg-loaded*
