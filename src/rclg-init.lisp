@@ -1,20 +1,20 @@
 ;;; RCLG: R-CommonLisp Gateway
 
 
-;;; Copyright (c) 2005--2007, <rif@mit.edu>
+;;; Copyright (c) 2005--2008, <rif@mit.edu>
 ;;;                           AJ Rossini <blindglobe@gmail.com>
 ;;; All rights reserved.
 ;;;
 ;;; Redistribution and use in source and binary forms, with or without
-;;; modification, are permitted provided that the following conditions are
-;;; met:
+;;; modification, are permitted provided that the following conditions
+;;; are met:
 ;;;
 ;;;     * Redistributions of source code must retain the above copyright
 ;;;       notice, this list of conditions and the following disclaimer.
 ;;;     * Redistributions in binary form must reproduce the above
-;;;       copyright notice, this list of conditions and the following disclaimer
-;;;       in the documentation and/or other materials provided with the
-;;;       distribution.
+;;;       copyright notice, this list of conditions and the following
+;;;       disclaimer in the documentation and/or other materials
+;;;       provided with the distribution.
 ;;;     * The names of the contributors may not be used to endorse or
 ;;;       promote products derived from this software without specific
 ;;;       prior written permission.
@@ -56,7 +56,7 @@
 
 ;; initialization
 (defvar *r-default-argv*
-  '("rclg" "-q" "--vanilla" "--max-ppsize=50000")) ; last term to incr stack
+  '("rclg" "-q" "--vanilla" "--max-ppsize=50000")) ; last term incr stack
 (defvar *r-started* nil)
 
 ;; thread management
@@ -158,6 +158,8 @@ need to check."
   (format t "STACK: LIMIT ~A, HANDLERS ~A~%" 
 	  *R-CSTACKLIMIT* *R-SIGNALHANDLERS*)
   (force-output t))
+;;(check-stack)
+
 
 (defun start-rclg (&optional (argv *r-default-argv*))
   "Initial the first R thread, perhaps with different arguments."  
