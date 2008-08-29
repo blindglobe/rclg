@@ -8,7 +8,7 @@
 
 ;; if needed...?  Shouldn't be, since rclg.asd ought to take care of
 ;; most of the issues that we have.
-(asdf:operate 'asdf:compile-op 'cffi)
+;; (asdf:operate 'asdf:compile-op 'cffi) ; should not be needed?
 (asdf:operate 'asdf:compile-op 'rclg)
 
 ;;(asdf:operate 'asdf:load-op 'cffi)

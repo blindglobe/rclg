@@ -158,6 +158,8 @@ need to check."
   (format t "STACK: LIMIT ~A, HANDLERS ~A~%" 
 	  *R-CSTACKLIMIT* *R-SIGNALHANDLERS*)
   (force-output t))
+;;(check-stack)
+
 
 (defun start-rclg (&optional (argv *r-default-argv*))
   "Initial the first R thread, perhaps with different arguments."  
