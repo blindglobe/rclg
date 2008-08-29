@@ -8,9 +8,9 @@
 
 ;; if needed...?  Shouldn't be, since rclg.asd ought to take care of
 ;; most of the issues that we have.
-(asdf:operate 'asdf:compile-op 'cffi :force t)
-(asdf:operate 'asdf:compile-op 'cffi)
-(asdf:operate 'asdf:compile-op 'rclg :force t)
+;;(asdf:operate 'asdf:compile-op 'cffi :force t)
+;;(asdf:operate 'asdf:compile-op 'cffi)
+;;(asdf:operate 'asdf:compile-op 'rclg :force t)
 (asdf:operate 'asdf:compile-op 'rclg)
 
 ;;(asdf:operate 'asdf:load-op 'cffi)
