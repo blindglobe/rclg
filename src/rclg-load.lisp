@@ -79,7 +79,10 @@
       (define-foreign-library libR
 	  (t (:default #.(concatenate 'string *R-HOME-STR* "/lib/libR"))))
       (use-foreign-library libR)
+      ;; (load-foreign-library libR)
       (setf *rclg-loaded* t))))
+
+;; (load-foreign-library "/usr/lib/R/lib/libR.so")
 
 ;; *rclg-loaded*
 ;; (load-r-libraries)

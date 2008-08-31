@@ -135,7 +135,7 @@ need to check."
 	  (foreign-free ,name))))))
 
 ;; FIXME:AJR what is the point of the equiv comments?  i.e. signed-long?
-(defcvar "R_CStackLimit"
+(defcvar ( "R_CStackLimit" *R-CSTACKLIMIT*)
     #-:x86-64 :unsigned-long
     #+:x86-64 :unsigned-long-long)
 (defcvar "R_SignalHandlers"
