@@ -122,8 +122,12 @@ something like *rclg-last-error* which could be originally nil?"
 
 (defun parse-keyword (exp kwd arg)
   (r-setcar exp (convert-to-r arg))
-  (with-foreign-string (f (string-downcase (symbol-name kwd)))
-    (%set-tag exp (%rf-install f))))
+  (let* ((name (symbol-name kwd))
+         (rname (if (eq #\! (aref name 0))
+                    (subseq name 1)
+                    (string-downcase name))))
+    (with-foreign-string (f rname)
+      (%set-tag exp (%rf-install f)))))
 
 (defun parse-regular-arg (exp arg)
   (r-setcar exp (convert-to-r arg)))
