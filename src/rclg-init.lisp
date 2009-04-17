@@ -1,7 +1,6 @@
 ;;; RCLG: R-CommonLisp Gateway
 
-
-;;; Copyright (c) 2005--2008, <rif@mit.edu>
+;;; Copyright (c) 2005--2009, <rif@mit.edu>
 ;;;                           AJ Rossini <blindglobe@gmail.com>
 ;;; All rights reserved.
 ;;;
@@ -43,8 +42,8 @@
 
 ;;; Basic Usage:
 ;; (start-rclg) ;; initializes RCLG functions.
-;; (update-R)   ;; sync all threads
-;;
+;; (update-R)   ;; sync all threads (SBCL only, need to include others).
+
 
 (defpackage :rclg-init
   (:use :common-lisp :rclg-foreigns :cffi)
@@ -58,6 +57,9 @@
 (defvar *r-default-argv*
   '("rclg" "-q" "--vanilla" "--max-ppsize=50000")) ; last term incr stack
 (defvar *r-started* nil)
+
+
+(setf *r-interactive* 1) ; nil?
 
 ;; thread management
 (defvar *do-rclg-updates-p* nil)
@@ -172,12 +174,10 @@ need to check."
 	      (with-foreign-string-array (foreign-argv n argv)
 		(%rf-initialize-r n foreign-argv)
 		(r-turn-off-stack-checking)
+		(setf *r-interactive* 1) ; nil?  Test?
 		(%setup-r-main-loop)
 		#+sbcl(start-rclg-update-thread)))))))
 
-;; FIXME:AJR: Do we really want to force this, or should we wait and
-;; let the user do this when appropriate?
-;; We let the user do it when ready.
-
+;;; Commented out, since we let the user do it when ready.
 ;;(eval-when (:load-toplevel)
 ;;  (start-rclg))

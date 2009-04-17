@@ -54,7 +54,8 @@
 	   :%rf-mkchar :%set-string-elt
 	   :%string-elt :%r-char :%r-check-activity :%r-run-handlers
 	   :*r-names-symbol* :*r-dims-symbol* :*r-global-env*
-	   :*r-unbound-value* :*r-nil-value* :*r-input-handlers*))
+	   :*r-unbound-value* :*r-nil-value* :*r-input-handlers*
+	   :*r-interactive*))
 
 (in-package :rclg-foreigns)
 
@@ -112,10 +113,14 @@
 (defcfun ("Rf_unprotect_ptr" %rf-unprotect-ptr) :void
   (s sexp))
 
-;; Call this to initialize
+;; Initialization/Finalization mgmt
+
 (defcfun ("Rf_initEmbeddedR" %rf-init-embedded-r) :int
   (argc :int)
   (argv :pointer))
+
+(defcfun ("Rf_endEmbeddedR" %rf-end-embedded-r) :void
+  (fatal :int))
 
 (defcfun ("Rf_initialize_R" %rf-initialize-r) :int
   (argc :int)
@@ -190,6 +195,8 @@
 (def-r-var "R_UnboundValue" *r-unbound-value*)
 (def-r-var "R_NilValue" *r-nil-value*)
 (def-r-var "R_InputHandlers" *r-input-handlers*)
+
+(defcvar ( "R_Interactive" *r-interactive* :read-only nil) :int)
 
 ;;; data to R conversion functions -- found in ../c/rclg-helpers.c
 ;; will only work if shared libraries are loaded.
