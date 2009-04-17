@@ -11,7 +11,7 @@
 ;; (asdf:operate 'asdf:compile-op 'cffi :force t)
 ;; (asdf:operate 'asdf:compile-op 'cffi)
 ;; (asdf:operate 'asdf:compile-op 'rclg :force t)
-(asdf:operate 'asdf:compile-op 'rclg)
+;; (asdf:operate 'asdf:compile-op 'rclg)
 
 ;;(asdf:operate 'asdf:load-op 'cffi)
 (asdf:operate 'asdf:load-op 'rclg)
@@ -22,10 +22,12 @@
 
 ;; Have we started yet?
 rclg-init::*r-started*
+rclg-init::*r-interactive*
 
 ;;;#3 Start R within Lisp
 
-(start-rclg)
+(start-rclg) ; => 0 ; if works, nil otherwise.
+
 
 ;; but if it fails, it could be related to...
 
@@ -33,6 +35,7 @@ rclg-init::*r-started*
 ;; and now we make sure it's working
 
 ;; rclg-init::*r-started*
+(setf  rclg-init::*r-interactive* 1) ; needed so that plot is interactive
 
 (rclg-init::check-stack)
 
@@ -89,6 +92,7 @@ rclg-init::*r-started*
 ;; code used above
 (defparameter *x* (r seq 1 10))
 (defparameter *y* (rnbi rnorm 10))
+(defparameter *y* (r rnorm 10))
 *y*
 (r plot *x* *y*)
 *y*
@@ -97,6 +101,8 @@ rclg-init::*r-started*
 ;; Really, you'll want rnbi to hold anonymous intermeditae results, like:
 
 (r plot *x* (rnbi rnorm 10))
+(r hist (r rnorm 10))
+(r plot (list 1 2 3 2 3 4 5))
 
 ;; Notes:
 ;; 
@@ -121,13 +127,16 @@ rclg-init::*r-started*
 (r "ls")
 (r "search")
 
+(elt (r "search") 3)
+
 (r "geterrmessage")
 
 
 ;; These don't work if we have library problems.
-(r "library" "stats") 
+(r "library" "stats")
 (r library "MASS")
-(r "library" "Biobase")
+
+;; (r "library" "Biobase") ;; Terminates if doesn't exists -- need to try/catch!
 
 (setf my.lib "Biobase")
 my.lib
@@ -142,10 +151,11 @@ my.lib
 
 (r assign "x" 5)
 (r assign "x2" (list 1 2 3 5))
-
+(r plot "x2" "x2") ; BOMBO.
 (r assign "x2" #(1 2 3 5 3 4 5))
 (r assign "z" "y") ;; unlike the above, this assigns character data
 (r "ls")
+;;(r "x2") ;halted "Error could not find function \"x2\""
 
 (setf my.r.x2 (r get "x2"))  ;; moving data from R to CL
 my.r.x2
